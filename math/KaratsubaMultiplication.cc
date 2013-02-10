@@ -30,18 +30,18 @@
 //   This formula requires only 3 multiplications.
 //
 //
-// Complexity
+// Complexity:
 //
 //   O(n^log 3).
 //   In practive, it is faster than naive method for n >= 1000.
 //
 //
-// Verified
+// Verified:
 //   SPOJ 31: Fast Multiplication
 //   (Remark: TLE for VFMUL)
 //
 //
-// References
+// References:
 //
 // - A. Karatsuba and Y. Ofman (1962): 
 //   Multiplication of Many-Digital Numbers by Automatic Computers,
