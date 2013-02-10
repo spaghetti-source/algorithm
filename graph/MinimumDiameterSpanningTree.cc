@@ -22,7 +22,7 @@
 //              (modify farthestOrder() to BFS)
 //
 //
-// References
+// References:
 //
 // - R. Hassin and A. Tamir (1995):
 //   On the minimum diameter spanning tree problem,
