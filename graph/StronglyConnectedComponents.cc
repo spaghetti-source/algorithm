@@ -22,9 +22,9 @@
 //
 // References: 
 //
-// - H.N. Gabow (2000):
+// - H. N. Gabow (2000):
 //   Path-based depth first search strong and biconnected components.
-//   Information Processing Letters, vol.74 no.3-4, pp.107-114.
+//   Information Processing Letters, vol.74, no.3-4, pp.107-114.
 //
 #include <iostream>
 #include <cstdio>
