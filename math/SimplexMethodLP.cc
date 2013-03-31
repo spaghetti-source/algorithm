@@ -73,7 +73,7 @@ double simplexMethodPD(double c[], int n, double b[], int m, double A[]) {
     }
     REP(j, m+1) if (j != q) T[j][p] /= T[q][p]; T[q][p] = 1; // pivot(q,p)
     REP(j, m+1) if (j != q) {
-      double alpha = T[j][p] / T[q][p];
+      double alpha = T[j][p];
       REP(i, n+m+1) T[j][i] -= T[q][i] * alpha;
     }
   }
