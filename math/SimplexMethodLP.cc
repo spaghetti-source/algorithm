@@ -20,7 +20,7 @@
 //
 // - G. B. Dantzig (1963):
 //   Linear Programming and Extensions.
-//   (rinceton University Press.
+//   Princeton University Press.
 //
 // - R. J. Vanderbei (2007):
 //   Linear programming: Foundations and Extensions.
