@@ -63,12 +63,12 @@ double simplexMethodPD(double c[], int n, double b[], int m, double A[]) {
 
     if (t < T[q][n+m]) { // tight on c -> primal update
       REP(j, m) if (T[j][p] >= EPS) 
-        if (T[j][p]*fabs(T[q][n+m]-t) >= T[q][p]*fabs(T[j][n+m]-t)) q = j;
+        if (T[j][p]*(T[q][n+m]-t) >= T[q][p]*(T[j][n+m]-t)) q = j;
       if (T[q][p] <= EPS) return INF; // primal infeasible
     } else { // tight on b -> dual update
       REP(i, n+m+1) T[q][i] *= -1;
       REP(i, n+m) if (T[q][i] >= EPS) 
-        if (T[q][i]*fabs(T[m][p]-t) >= T[q][p]*fabs(T[m][i]-t)) p = i;
+        if (T[q][i]*(T[m][p]-t) >= T[q][p]*(T[m][i]-t)) p = i;
       if (T[q][p] <= EPS) return -INF; // dual infeasible
     }
     REP(i, m+n+1) if (i != p) T[q][i] /= T[q][p]; T[q][p] = 1; // pivot(q,p)
