@@ -71,7 +71,7 @@ double simplexMethodPD(double c[], int n, double b[], int m, double A[]) {
         if (T[q][i]*fabs(T[m][p]-t) >= T[q][p]*fabs(T[m][i]-t)) p = i;
       if (T[q][p] <= EPS) return -INF; // dual infeasible
     }
-    REP(j, m+1) if (j != q) T[j][p] /= T[q][p]; T[q][p] = 1; // pivot(q,p)
+    REP(i, m+n+1) if (i != p) T[q][i] /= T[q][p]; T[q][p] = 1; // pivot(q,p)
     REP(j, m+1) if (j != q) {
       double alpha = T[j][p];
       REP(i, n+m+1) T[j][i] -= T[q][i] * alpha;
