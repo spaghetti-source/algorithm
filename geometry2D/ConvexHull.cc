@@ -1,5 +1,5 @@
 //
-// Convex Hull (2D)
+// Convex hull (2D)
 //
 // Description:
 //
@@ -17,7 +17,7 @@
 //     Another efficient algorithm for convex hulls in two dimensions.
 //     Information Processing Letters, vol.9, pp.216-219.
 //
-//
+
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
