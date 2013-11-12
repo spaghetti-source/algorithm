@@ -26,7 +26,7 @@
 // References:
 //   J. E. Hopcroft and R. M. Karp (1973):
 //   An n^5/2 algorithm for maximum matchings in bipartite graphs.
-//   SIAM Journal on Computing, vol.2, no.4, pp.225-231.
+//   SIAM Journal on Computing, vol. 2, no. 4, pp. 225-231.
 //
 
 #include <iostream>
