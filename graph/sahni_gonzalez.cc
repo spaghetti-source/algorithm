@@ -6,7 +6,6 @@
 //   Given a weighted undirected graph G = (V, E), w: E -> R+.
 //   Find a maximum cut, i.e., a subset S such that w(S,V-S) is maximum.
 //   This problem is known to be NP-hard. 
-//   Furthermore, approximating better than 0.878 is UGC-hard.
 //
 //
 // Algorithm:
@@ -40,7 +39,7 @@
 
 using namespace std;
 
-struct max_cut_solver {
+struct maximum_cut {
   int n;
   struct edge {
     int src, dst;
@@ -119,7 +118,7 @@ double tick() {
 }
 
 int main() {
-  max_cut_solver solver;
+  maximum_cut solver;
 
   int n = 100000, m = 1000000;
   for (int i = 0; i < m; ++i) {
