@@ -8,4 +8,4 @@ You can use these codes for any purpose without warranty,
 but I recommend you to "re-implement" the code yourself.
 
 
-Contact me: e-mail: maehara@prefield.com / twitter: @tmaehara
+author: Takanori MAEHARA (e-mail: maehara@prefield.com / twitter: @tmaehara)
