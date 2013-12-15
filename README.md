@@ -1,8 +1,12 @@
 Algorithm
 =========
-Implementations of typical algorithms.
+Simple C++ implementations of algorithms.
 
-You can use these codes for any purpose without warranty.
+These codes are for understanding ideas of algorithms,
+so not optimized for the performance.
+
+You can use these codes for any purpose without warranty,
+but I recommend you to "re-implement" the code yourself.
 
 
-Contact: e-mail: maehara@prefield.com / twitter: @tmaehara
+Contact me: e-mail: maehara@prefield.com / twitter: @tmaehara
