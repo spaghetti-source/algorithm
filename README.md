@@ -1,6 +1,5 @@
-Algorithm
+C++ implementations of algorithms
 =========
-C++ implementations of algorithms.
 
 These codes are for understanding ideas of algorithms,
 so not optimized for the performance.
