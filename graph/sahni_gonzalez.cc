@@ -9,9 +9,9 @@
 //
 //
 // Algorithm:
-//   Sahni and Gonzales'z greedy algorithm.
+//   Sahni and Gonzalez's greedy algorithm.
 //   The algorithm has only 1/2 approximation ratio, 
-//   but in practice it has much better performance.
+//   but this has one of the best performance in practice.
 //
 //
 // Complexity:
