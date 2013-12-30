@@ -2,6 +2,7 @@ struct union_find {
   int components;
   vector<int> root, next, size;
   void clear(int n) {
+    components = n;
     root.resize(n);
     iota(root.begin(), root.end(), 0);
     next.assign(n, -1);
