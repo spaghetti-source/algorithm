@@ -16,7 +16,7 @@
 //     min_u max_k [d(s,u;n) - d(s,u;k)]/(n-k)
 //   is the length of minimum mean cycle.
 //
-//   (prf. Note that d(s,u;k) consists of cycle + path.
+//   (prf. Note that d(s,u;n) consists of cycle + path.
 //    Subtract the path, we obtain a length of cycle.)
 //
 // 
