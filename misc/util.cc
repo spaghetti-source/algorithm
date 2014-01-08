@@ -1,5 +1,5 @@
 template <class T>
-struct eictionary {
+struct dictionary {
   unordered_map<T, size_t> dict;
   vector<T> idict;
   size_t id(T s) { 
