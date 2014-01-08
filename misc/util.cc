@@ -12,5 +12,7 @@ struct dictionary {
   T value(size_t id) {
     return idict[id];
   }
+  size_t size() const {
+    return dict.size();
+  }
 };
-
