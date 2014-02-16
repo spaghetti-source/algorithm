@@ -1,18 +1,23 @@
+#pragma once
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <cstdio>
 struct parse_args {
-  unordered_map<string, string> args;
+  std::unordered_map<std::string, std::string> args;
   parse_args(int argc, char *argv[]) {
     for (int i = 1; argv[i]; ++i) {
       char cmd[256], param[256];
-      sscanf(argv[i], "%[^=]=%s", cmd, param);
-      args[string(cmd)] = string(param);
+      std::sscanf(argv[i], "%[^=]=%s", cmd, param);
+      args[cmd] = param;
     }
   }
-  bool has(string s) {
+  bool has(std::string s) {
     return args.count(s);
   }
   template <class T>
-  T get(string s) {
-    stringstream ss(args[s]);
+  T get(std::string s) {
+    std::stringstream ss(args[s]);
     T value;
     ss >> value;
     return value;
