@@ -9,11 +9,13 @@
 //
 //
 // Algorithm:
-//   Gabow's one-pass / two-stacks algorithm.
+//   Tarjan's single DFS / single stack algorithm.
 //
 //
 // Complexity:
-//   O(n + m) time and space.
+//   O(n + m) time and space. 
+//   Note that this is much faster than Kosaraju's two DFS algorithm,
+//   and almost as fast as Gabow's single DFS / two stacks algorithm.
 //
 //
 // Verified:
@@ -22,103 +24,93 @@
 //
 // References: 
 //
-// - H. N. Gabow (2000):
-//   Path-based depth first search strong and biconnected components.
-//   Information Processing Letters, vol.74, no.3-4, pp.107-114.
+// - R. E. Tarjan (1972):
+//   Depth-first search and linear graph algorithms.
+//  SIAM Journal on Computing, vol.1, no.2, pp.146–160.
 //
+
 #include <iostream>
+#include <vector>
 #include <cstdio>
 #include <cstdlib>
-#include <vector>
+#include <map>
+#include <cmath>
 #include <cstring>
 #include <functional>
 #include <algorithm>
-#include <stack>
 
 using namespace std;
 
-#define ALL(c) c.begin(), c.end()
-#define FOR(i,c) for(typeof(c.begin())i=c.begin();i!=c.end();++i)
-#define REP(i,n) for(int i=0;i<n;++i)
 #define fst first
 #define snd second
+#define all(c) ((c).begin()), ((c).end())
 
-struct Graph {
-  int n;
-  vector< vector<int> > adj;
-  stack<int> S, B;
-  vector<int> I;
-  Graph(int n) : n(n), adj(n), I(n) { }
-  void addEdge(int u, int v) {
-    adj[u].push_back(v); // directed
-  }
-  void visit(int v) {
-    B.push(I[v] = S.size());
-    S.push(v);
-    FOR(e, adj[v]) { 
-      int w = *e;
-      if (!I[w]) visit(w);
-      else while (I[w] < B.top()) B.pop();
-    }
-    if (I[v] == B.top()) {
-      B.pop();
-      for (; I[v] < S.size(); S.pop()) 
-        cout << S.top() << " ";
-      cout << endl;
-    }
-  }
-  void stronglyConnectedComponents() {
-    REP(v, n) if (!I[v]) visit(v);
-  }
+struct edge {
+  int src, dst;
 };
-
-int main() { }
-
-// usage
-namespace SPOJ6818 {
-struct Graph {
+struct graph {
   int n;
-  vector< vector<int> > adj;
-  stack<int> S, B;
-  vector<int> I;
-  int C;
-  vector<int> id; 
-  Graph(int n) : n(n), adj(n), I(n), C(0), id(n) { }
-  void addEdge(int u, int v) {
-    adj[u].push_back(v); // directed
+  vector<vector<edge>> adj;
+  void add_edge(int src, int dst) {
+    adj[src].push_back({src, dst});
   }
-  void visit(int v) {
-    B.push(I[v] = S.size());
-    S.push(v);
-    FOR(e, adj[v]) { 
-      int w = *e;
-      if (!I[w]) visit(w);
-      else while (I[w] < B.top()) B.pop();
+  graph(int n) : n(n), adj(n) { }
+
+  vector<int> open, id;
+  vector<vector<int>> scc;
+  int visit(int i, int &t) {
+    int w = i;
+    open.push_back(i);
+    id[i] = t++;
+    for (auto e: adj[i]) {
+      if (id[e.dst] == 0) {
+        int k = visit(e.dst, t);
+        if (id[w] > id[k]) w = k;
+      } else if (id[e.dst] < 0) {
+        if (id[w] > id[e.dst]) w = e.dst;
+      }
     }
-    if (I[v] == B.top()) {
-      B.pop();
-      for (; I[v] < S.size(); S.pop()) 
-        id[ S.top() ] = C;
-      ++C;
+    if (w == i) {
+      scc.push_back({});
+      while (1) {
+        int j = open.back();
+        open.pop_back();
+        id[j] = scc.size();
+        scc.back().push_back(j);
+        if (i == j) break;
+      }
     }
+    return w;
   }
-  void stronglyConnectedComponents() {
-    REP(v, n) if (!I[v]) visit(v);
+  int strongly_connected_components() {
+    scc.clear();
+    open.clear();
+    id.assign(n, 0);
+    for (int i = 0, t = -n-1; i < n; ++i) {
+      if (id[i] == 0) {
+        visit(i, t);
+      }
+    }
+    return scc.size();
   }
 
-  // SPOJ 6818
   void solve() {
-    stronglyConnectedComponents();
-    vector<int> outdeg(C);
-    REP(u, n) FOR(e, adj[u]) 
-      if (id[u] != id[*e]) ++outdeg[ id[u] ];
-    int c = find(ALL(outdeg), 0) - outdeg.begin();
+    strongly_connected_components();
+    vector<int> outdeg(scc.size());
+    for (int i = 0; i < n; ++i) {
+      for (auto e: adj[i]) {
+        if (id[e.src] != id[e.dst]) ++outdeg[ id[e.src]-1 ];
+      }
+    }
+    int c = find(all(outdeg), 0) - outdeg.begin();
     if (c == outdeg.size()) {
       printf("0\n");
       return;
     }
     vector<int> component;
-    REP(u, n) if (id[u] == c) component.push_back(u);
+    for (int i = 0; i < n; ++i) {
+      if (id[i]-1 == c) component.push_back(i);
+    }
     printf("%d\n%d", component.size(), component[0]+1);
     for (int i = 1; i < component.size(); ++i) 
       printf(" %d", component[i]+1);
@@ -129,12 +121,11 @@ struct Graph {
 int main() {
   int n, m;
   scanf("%d %d", &n, &m);
-  Graph G(n);
-  REP(i, m) {
-    int src, dst;
-    scanf("%d %d", &src, &dst);
-    G.addEdge(src-1, dst-1);
+  graph g(n);
+  for (int k = 0; k < m; ++k) {
+    int i, j;
+    scanf("%d %d", &i, &j);
+    g.add_edge(i-1, j-1);
   }
-  G.solve();
-}
+  g.solve();
 }
