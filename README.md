@@ -2,8 +2,9 @@ C++ implementations of algorithms
 =========
 
 These are my C++ implementations for some (typical) algorithms.
-The codes are written to understand the algorithms,
-so not optimized for the performance.
+The codes are written for understanding the algorithms,
+hence these are not optimized for the performance.
+(However, I often use these codes for the research purpose.)
 
 You can use these codes for any purpose,
 but I recommend you to "re-implement" the code yourself.
