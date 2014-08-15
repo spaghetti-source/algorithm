@@ -3,9 +3,10 @@
 #include <string>
 #include <unordered_map>
 #include <cstdio>
-struct parse_args {
+
+namespace parse_args {
   std::unordered_map<std::string, std::string> args;
-  parse_args(int argc, char *argv[]) {
+  void init(int argc, char *argv[]) {
     for (int i = 1; argv[i]; ++i) {
       char cmd[256], param[256];
       std::sscanf(argv[i], "%[^=]=%s", cmd, param);
@@ -16,7 +17,7 @@ struct parse_args {
     return args.count(s);
   }
   template <class T>
-  T get(std::string s) {
+  T get(std::string s, T x = T()) {
     std::stringstream ss(args[s]);
     T value;
     ss >> value;
