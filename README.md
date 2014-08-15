@@ -7,7 +7,7 @@ hence these are not optimized for the performance.
 (However, I often use these codes for the research purpose.)
 
 These codes are  *public domain*.
-You can use these codes for any purpose.
+You can use them for any purpose.
 (I recommend you to "re-implement" the codes for your purpose)
 
 
