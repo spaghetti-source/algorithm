@@ -23,7 +23,6 @@
 //
 
 #include <iostream>
-#include <memory>
 #include <vector>
 #include <cstdio>
 #include <functional>
@@ -58,6 +57,7 @@ struct persistent_array {
         arr[op[i].fst] = op[i].snd;
       op.clear();
     }
+    return x;
   }
 };
 
