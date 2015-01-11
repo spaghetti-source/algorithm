@@ -1,3 +1,26 @@
+// 
+// Link Cut Tree (Slator-Tarjan)
+//
+// Decription:
+//   It maintains rooted forests with link/cut operations
+//
+// Algorithm:
+//   Classify links into solid and dashed.
+//   Here, each vertex has at most one solid link.
+//   Then, maintain solid paths by splay trees,
+//   which are sorted in the depth of the vertices.
+//   see: http://planarity.org/Klein_splay_trees_and_link-cut_trees.pdf
+// 
+// Complexity:
+//   O(log n), amortized.
+//
+
+#include <iostream>
+#include <cstdio>
+#include <vector>
+
+using namespace std;
+
 struct link_cut_tree {
   struct node { 
     int x, s; // value and sum
@@ -16,6 +39,7 @@ struct link_cut_tree {
   }
   void connect(node *p, node *t, int d) {
     p->ch[d] = t; if (t) t->p = p;
+    update(p);
   }
   void rot(node *t) {
     node *p = t->p;
@@ -24,7 +48,6 @@ struct link_cut_tree {
     else             t->p = p->p;
     connect(p, t->ch[!d], d);
     connect(t, p, !d);
-    update(p); update(t);
   }
   void splay(node *t) {
     for (; !is_root(t); rot(t))
@@ -34,14 +57,15 @@ struct link_cut_tree {
     node *l = 0;
     for (node *s = t; s; s = s->p) {
       splay(s);
-      s->ch[1] = l;
-      l = update(s);
+      connect(s, l, 1);
+      l = s;
     }
     splay(t);
     return l;
   }
-  void link(node *p, node *t) {
+  void link(node *t, node *p) { 
     expose(t);
+    expose(p);
     t->p = p;
   }
   void cut(node *t) {
@@ -49,11 +73,44 @@ struct link_cut_tree {
     t->ch[0] = t->ch[0]->p = 0;
   }
   node *lca(node *s, node *t) {
-    expose(s); 
-    return expose(t);
+    expose(s);
+    node *u = expose(t);
+    return !s->p ? 0 : u;
   }
   int sum_to_root(node *t) {
     expose(t);
     return sum(t->ch[0]) + t->x;
   }
 };
+
+int main() {
+  link_cut_tree LCT;
+  int n, m; cin >> n >> m;
+
+  vector<link_cut_tree::node*> a(n);
+  for (int i = 0; i < n; ++i) {
+    a[i] = LCT.make_node(i+1);
+  }
+
+  int u, v;
+  link_cut_tree::node *p;
+  for (int k = 0; k < m; ++k) {
+    int t; cin >> t;
+    switch (t) {
+      case 1:
+        cin >> u >> v; --u; --v;
+        LCT.link(a[u], a[v]);
+        break;
+      case 2:
+        cin >> u; --u;
+        LCT.cut(a[u]);
+        break;
+      case 3:
+        cin >> u >> v; --u; --v;
+        p = LCT.lca(a[u], a[v]);
+        if (!p) cout << "-1" << endl;
+        else    cout << p->x << endl;
+      break;
+    }
+  }
+}
