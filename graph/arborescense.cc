@@ -7,32 +7,28 @@
 //     (2) for each u in V, indeg_T(u) <= 1, indeg_T(r) = 0.
 //   The program finds the minimum weight of r-arborescence.
 //
-//
 // Algorithm:
 //   Gabow et al.'s efficient implementation of Chu-Liu/Edmonds.
 //   Use disjoint set and mergeable heap data structure.
 //
-//
 // Complexity: 
 //   O(m log n)
-//
 //
 // Remark:
 //   To recover the edges, it requires additional works. 
 //   See Camerini et al.
 //
-//
 // References: 
 //   H. N. Gabow, Z. Galil, T. Spencer, and R. E. Tarjan (1986):
-//   Efficient algorithms for finding minimum spanning trees in undirected and directed graphs, 
+//   Efficient algorithms for finding minimum spanning trees in undirected and directed graphs.
 //   Combinatorica, vol 6, pp. 109--122.
 //
 //   Y. J. Chu and T. H. Liu (1965): 
-//   On the shortest arborescence of a directed graph,
+//   On the shortest arborescence of a directed graph.
 //   Science Sinica, vol. 14, pp. 1396--1400.
 //
 //   J. Edmonds (1967): 
-//   Optimum branchings
+//   Optimum branchings.
 //   Journal on Research of the National Bureau of Standards, 71B,
 //   pp. 233--240.
 //
