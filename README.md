@@ -2,7 +2,7 @@ C++ implementations of algorithms
 =========
 
 These codes are my C++ implementations of algorithms, 
-which are written for explanating/understanding algorithms.
+which are written for studying/understanding algorithms.
 
 I publish these codes in *public domain.*
 You can use them for any purpose without any warranty.
