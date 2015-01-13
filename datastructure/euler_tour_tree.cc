@@ -109,9 +109,6 @@ int main() {
   //        3
   //      1   4
   //     1 5 9 2
-  //
-  // LCS の計算
-  //
 
   auto ab = ETT.link(a, b);
   ETT.link(a, c);
