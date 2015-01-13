@@ -1,5 +1,5 @@
 // 
-// Fully Persistent Array (sqrt decomposition)
+// Persistent Array (sqrt decomposition)
 //
 //
 // Description:
