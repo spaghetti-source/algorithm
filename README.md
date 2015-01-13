@@ -1,14 +1,12 @@
 C++ implementations of algorithms
 =========
 
-These are my C++ implementations for some (typical) algorithms.
-The codes are written for understanding the algorithms,
-hence these are not optimized for the performance.
-(However, I often use these codes for the research purpose.)
+These codes are my C++ implementations of algorithms, 
+which are written for explanating/understanding algorithms.
 
-These codes are  *public domain*.
-You can use them for any purpose.
-(I recommend you to "re-implement" the codes for your purpose)
+I publish these codes in *public domain.*
+You can use these codes for any purpose without any warranty.
+(but I strongly recommend you to "re-implement" the codes for your purpose.)
 
 
 author: Takanori MAEHARA (e-mail: maehara@prefield.com / twitter: @tmaehara)
