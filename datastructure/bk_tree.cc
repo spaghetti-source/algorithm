@@ -1,5 +1,5 @@
 //
-// BK Tree
+// Burkhard-Keller Tree (metric tree)
 //
 // 
 // Description:
