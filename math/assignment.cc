@@ -117,8 +117,8 @@ double tick() {
 int seed;
 vector<vector<int>> matrix() {
   srand( seed );
-  n = 2000; 
-  m = 3000;
+  int n = 2000; 
+  int m = 3000;
   vector<vector<int>> c(n, vector<int>(m));
   for (int i = 0; i < n; ++i)
     for (int j = 0; j < m; ++j)
