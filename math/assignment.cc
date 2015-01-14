@@ -44,14 +44,8 @@ using namespace std;
 #define snd second
 #define all(c) ((c).begin()), ((c).end())
 
-const int maxn = 1010;
-
-int n, m;
-int c[maxn][maxn];
-
 typedef int value_type;
 const value_type inf = 99999999;
-
 value_type min_assignment(const vector<vector<value_type>> &c) {
   const int n = c.size(), m = c[0].size(); // assert(n <= m);
   vector<value_type> v(m), dist(m);        // v: potential
