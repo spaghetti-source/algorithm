@@ -13,6 +13,9 @@
 //
 // Complexity:
 //   O(m log n)
+//
+// Verified:
+//   SPOJ964
 // 
 // References:
 //   T. Lengauer and R. Tarjan (1979):
@@ -35,11 +38,11 @@ using namespace std;
 #define snd second
 #define all(c) ((c).begin()), ((c).end())
 
-
 struct edge { int src, dst; };
 struct graph {
   int n;
   vector<vector<edge>> adj, rdj;
+  graph(int n = 0) : n(0) { } 
   void add_edge(int src, int dst) {
     n = max(n, max(src, dst)+1);
     adj.resize(n); rdj.resize(n);
@@ -47,79 +50,69 @@ struct graph {
     rdj[dst].push_back({dst, src});
   }
 
-  vector<int> rank, semi, label, ancestor;
-  void compress(int v) {
-    int a = ancestor[v];
-    if (ancestor[a] < 0) return;
-    compress(a);
-    if (rank[semi[label[v]]] > rank[semi[label[a]]]) label[v] = label[a];
-    ancestor[v] = ancestor[a];
+  vector<int> rank, semi, low, anc;
+  int eval(int v) { 
+    if (anc[v] < n && anc[anc[v]] < n) {
+      int x = eval(anc[v]);
+      if (rank[semi[low[v]]] > rank[semi[x]]) low[v] = x;
+      anc[v] = anc[anc[v]];
+    }
+    return low[v];
   }
-  int eval(int v) {
-    if (ancestor[v] < 0) return v;
-    compress(v); 
-    return label[v];
-  }
-  vector<int> parent, ord;
+  vector<int> prev, ord;
   void dfs(int u) {
     rank[u] = ord.size();
     ord.push_back(u);
     for (auto e: adj[u]) {
-      if (rank[e.dst] >= 0) continue;
-      parent[e.dst] = u;
+      if (rank[e.dst] < n) continue;
       dfs(e.dst);
+      prev[e.dst] = u;
     }
   }
-  vector<int> dom;
+  vector<int> idom; // idom[u] is an immediate dominator of u
   void dominator_tree(int r) {
-    rank.assign(n, -1); 
-    parent.resize(n);
-    ord.clear();
-    dfs(r);
+    idom.assign(n, n); prev = rank = anc = idom;
+    semi.resize(n); iota(all(semi), 0); low = semi;
+    ord.clear(); dfs(r);
 
-    ancestor.assign(n, -1);
-    semi.resize(n); iota(all(semi), 0);
-    label = semi;
-
-    dom.assign(n, -1);
-    vector<vector<int>> bucket(n);
+    vector<vector<int>> dom(n);
     for (int i = ord.size()-1; i >= 1; --i) {
       int w = ord[i];
       for (auto e: rdj[w]) {
         int u = eval(e.dst);
-        if (rank[semi[u]] < rank[semi[w]]) semi[w] = semi[u];
+        if (rank[semi[w]] > rank[semi[u]]) semi[w] = semi[u];
       }
-      bucket[semi[w]].push_back(w);
-      ancestor[w] = parent[w];
-      for (int v: bucket[parent[w]]) {
+      dom[semi[w]].push_back(w);
+      anc[w] = prev[w];
+      for (int v: dom[prev[w]]) {
         int u = eval(v);
-        dom[v] = (rank[semi[u]] < rank[semi[v]] ? u : parent[w]);
+        idom[v] = (rank[prev[w]] > rank[semi[u]] ? u : prev[w]);
       }
-      bucket[parent[w]].clear();
+      dom[prev[w]].clear();
     }
     for (int i = 1; i < ord.size(); ++i) {
       int w = ord[i];
-      if (dom[w] != semi[w]) dom[w] = dom[dom[w]];
-    } // i's immediate dominator = dom[i]
+      if (idom[w] != semi[w]) idom[w] = idom[idom[w]];
+    }
   }
   vector<int> dominators(int u) {
     vector<int> S;
-    for (; u >= 0; u = dom[u]) S.push_back(u);
+    for (; u < n; u = idom[u]) S.push_back(u);
     return S;
   }
 };
 
-
 int main() {
-  graph g;
-  g.add_edge(0, 1);
-  g.add_edge(1, 2);
-  g.add_edge(2, 3);
-  g.add_edge(3, 4);
-  g.add_edge(4, 5);
-  g.add_edge(0, 4);
-
-  g.dominator_tree(0);
-  for (auto a: g.dominators(5))
-    cout << a << endl;
+  int t; scanf("%d", &t);
+  while (t--) {
+    int n, m; scanf("%d %d", &n, &m);
+    graph g(n);
+    for (int i = 0; i < m; ++i) {
+      int u, v; scanf("%d %d", &u, &v);
+      g.add_edge(u-1, v-1);
+    }
+    g.dominator_tree(0);
+    auto S = g.dominators(n-1);
+    cout << S[S.size()-2]+1 << endl;
+  }
 }
