@@ -3,13 +3,14 @@
 //
 // Description:
 //   Let G = (V, E) be a directed graph and fix r in V.
-//   v is a dominator of u if any path between r and u throughs v.
+//   v is a dominator of u if any paths from r to u through v.
 //   The set of dominators of u forms a total order, and 
-//   the minimum dominator is called the immediate dominator.
-//   The dominator tree is { (u,v) : v is the immediate dominator }.
+//   the closest dominator is called the immediate dominator.
+//   The set { (u,v) : v is the immediate dominator } forms a tree, 
+//   which is called the dominator tree.
 //
 // Algorithm:
-//   Lengauer and Tarjan.
+//   Lengauer and Tarjan's DFS-based algorithm.
 //
 // Complexity:
 //   O(m log n)
