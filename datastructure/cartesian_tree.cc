@@ -9,18 +9,20 @@
 //     and the right child is the Cartesian tree for the right of the min.
 // 
 // Algorithm:
-//   Left-to-right method. 
-//
-// Complexity:
-//   O(n).
-//
-// Verified:
-//   SPOJ11772, SPOJ1005604
+//   Left-to-right construction. 
 //
 // Applications:
+//   In order traversal gives the original sequence. 
 //   Sorting can be performed in O(n log k)
 //   LCA of two element gives RMQ in original sequence.
-//   (Offline LCA is nice for this datastructure)
+//
+// Complexity:
+//   construction: O(n)
+//   sort: O(n log k) by using priority queue.
+//   offline RMQ: O(n + q) by Tarjan's offline LCA.
+//
+// Verified:
+//   SPOJ11772, SPOJ1005604 for RMQ.
 //
 // References:
 //   C. Levcopoulos and O. Petersson (1989):
