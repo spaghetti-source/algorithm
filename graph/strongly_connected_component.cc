@@ -5,28 +5,23 @@
 //   Compute the strongly connected components(SCCs) decomposition.
 //   A set of vertices S of a digraph is a SCC iff 
 //   for each u, v in S, there is a path from u to v.
-//   Any digraph can be uniquely split into SCCs.
-//
+//   Any graph can be uniquely decomposed into SCCs.
 //
 // Algorithm:
 //   Tarjan's single DFS / single stack algorithm.
-//
 //
 // Complexity:
 //   O(n + m) time and space. 
 //   Note that this is much faster than Kosaraju's two DFS algorithm,
 //   and almost as fast as Gabow's single DFS / two stacks algorithm.
 //
-//
 // Verified:
-//   SPOJ 6818: Capital City
-//
+//   SPOJ6818
 //
 // References: 
-//
 // - R. E. Tarjan (1972):
 //   Depth-first search and linear graph algorithms.
-//  SIAM Journal on Computing, vol.1, no.2, pp.146–160.
+//   SIAM Journal on Computing, vol.1, no.2, pp.146–160.
 //
 
 #include <iostream>
