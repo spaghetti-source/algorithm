@@ -7,15 +7,18 @@
 //   SAT finds an assignment x for phi(x) = true.
 //
 // Algorithm:
-//   Davis-Putnum-Logemann-Loveland's algorithm
-//   that performs 
+//   Davis-Putnum-Logemann-Loveland's algorithm that performs 
 //     1) unit propagation, 
 //     2) pure literal elimination,
+//     3) branch and search.
 //  
 // Complexity:
 //   O(n^2) in worst case. 
-//   In this representation, n = 100 is practical.
+//   In this implementation, n = 100 is practical.
 //
+// Verified:
+//   Uniform 3-SAT instances from http://www.cs.ubc.ca/~hoos/SATLIB/benchm.html
+
 
 #include <iostream>
 #include <vector>
