@@ -20,7 +20,7 @@
 //   W. Dowling and J. Gallier (1984) 
 //   Linear-time algorithms for testing the satisfiability of propositional Horn formulae.
 //   Journal of Logic Programming, vol. 3, pp. 267-284
-
+ 
 #include <iostream>
 #include <vector>
 #include <cstdio>
