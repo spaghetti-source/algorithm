@@ -23,6 +23,12 @@
 //
 // Verified:
 //   SPOJ7826.
+//
+// References:
+//   A. V. Aho, J. E. Hopcroft, and J. D. Ullman (1974):
+//   The Design and Analysis of Computer Algorithms.
+//   Addison-Wesley.
+
 
 #include <iostream>
 #include <algorithm>
