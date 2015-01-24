@@ -2,7 +2,7 @@
 // Tree Isomorphism
 //
 // Description:
-//   A rooted tree (S,s) and (T,t) are isomorphic
+//   Rooted trees (S,s) and (T,t) are isomorphic
 //   iff there is a bijection between childs of s and childs of t
 //   such that s.child[i] and t.child[pi[i]] is isomorphic.
 //
