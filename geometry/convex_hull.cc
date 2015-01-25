@@ -1,18 +1,13 @@
 //
-// Convex hull (2D)
+// Convex hull of 2D points
 //
 // Description:
-//
 //   Find a convex hull of point sets.
 //
-//
 // Algorithm:
-//
 //   Andrew's monotone chain.
 //
-//
 // References:
-//
 //   A. M. Andrew (1979): 
 //     Another efficient algorithm for convex hulls in two dimensions.
 //     Information Processing Letters, vol.9, pp.216-219.
