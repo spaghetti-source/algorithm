@@ -50,6 +50,18 @@ vector<point> intersect(circle C, circle D) {
   return {C.p + v*a + point(0,1)*v*h,           // intersect
           C.p + v*a - point(0,1)*v*h};
 }
+//
+// Intersection of line L and circle C.
+//
+// Let p(t) = L.p + t (L.q - L.p). We solve
+//   |p(t) - C.p|^2 = C.r^2
+// By letting u = L.p - L.q, v = L.p - C.p, the above is
+//   t^2 (u,u) + 2 t (u,v) + (v,v) = C.r^2
+//       ~~a~~       ~~b~~   ~~c~~
+// Thus
+//   det = b^2 - ac,
+//   t in { (b + sqrt(det))/a, c/(b + sqrt(det)) }
+//
 vector<point> intersect(line L, circle C) {
   point  u = L.p - L.q, v = L.p - C.p;
   double a = norm(u), b = dot(u,v), c = norm(v),
@@ -61,6 +73,8 @@ vector<point> intersect(line L, circle C) {
 }
 
 //
+// Tangent point(s) of point p and circle C
+// 
 // Let q be a tangent point.
 // The angle between q-p-c.p is 
 //   sin(t) = r/|p - c.p|.
