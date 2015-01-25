@@ -59,17 +59,6 @@ vector<point> intersect(line L, circle C) {
   return {L.p - (b + sqrt(det))/a*u,
           L.p - c/(b + sqrt(det))*u};
 }
-vector<point> intersect(line L, line M) {
-  double a = cross(M.p - L.p, M.q - M.p), 
-         b = cross(L.q - L.p, M.q - M.p);
-  if (sign(b) != 0) return {L.p + (L.q - L.p)*a/b}; // cross
-  if (sign(a) == 0) return {L.p, L.q};              // same line
-  return {};                                        // disj. parallel
-}
-vector<point> intersect(segment S, line L) {
-  return {};
-}
-
 
 //
 // Let q be a tangent point.
