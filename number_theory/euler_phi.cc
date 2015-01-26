@@ -2,9 +2,11 @@
 // Euler Phi (Totient Function)
 //
 // Description:
-//   phi(n) = #{ k <= n : k is coprime to n }
-//          = n (1 - 1/p1) ... (1 - 1/pm).
-//   This is a number theoretic function.
+//     phi(n) = #{ k <= n : k is coprime to n }
+//            = n (1 - 1/p1) ... (1 - 1/pm).
+//   or equivalently
+//     phi(p^k) = (p-1) p^{k-1}.
+//   with multiplicative.
 //
 // Complexity:
 //   euler_phi(n):     O(sqrt(n)) by trial division.
@@ -75,28 +77,44 @@ vector<ll> primes(ll n) { // primes in [0,n)
 }
 vector<ll> euler_phi(ll lo, ll hi) { // phi(n) for all n in [lo, hi)
   vector<ll> ps = primes(sqrt(hi)+1);
-  vector<ll> res(hi-lo), phi(hi-lo);
-  iota(all(phi), lo); iota(all(res), lo);
+  vector<ll> res(hi-lo), phi(hi-lo, 1);
+  iota(all(res), lo);
 
   for (ll p: ps) {
     for (ll k = ceil(1.0*lo/p)*p; k < hi; k += p) {
-      phi[k-lo] -= phi[k-lo]/p;
-      while (res[k-lo] % p == 0) 
-        res[k-lo] /= p;
+      if (res[k-lo] <= 1) continue;
+      phi[k-lo] *= (p - 1);
+      res[k-lo] /= p;
+      while (res[k-lo] > 1 && res[k-lo] % p == 0) {
+        phi[k-lo] *= p;
+        res[k-lo] /= p; 
+      }
     }
   }
   for (ll k = lo; k < hi; ++k) {
     if (res[k-lo] > 1) 
-      phi[k-lo] -= phi[k-lo]/res[k-lo];
+      phi[k-lo] *= (res[k-lo]-1);
   }
   return phi; // phi[k-lo] = phi(k)
 }
 
+// === tick a time ===
+#include <ctime>
+double tick() {
+  static clock_t oldtick;
+  clock_t newtick = clock();
+  double diff = 1.0*(newtick - oldtick) / CLOCKS_PER_SEC;
+  oldtick = newtick;
+  return diff;
+}
+
 int main() {
+
   for (int iter = 0; iter < 100; ++iter) {
     int lo = rand(), hi = lo + rand();
     auto x = euler_phi(lo, hi);
     for (int n = lo; n < hi; ++n)
       if (x[n-lo] != euler_phi(n)) cout << "!!" << endl;
   }
+  cout << t1 << " / " << t2 << endl;
 }
