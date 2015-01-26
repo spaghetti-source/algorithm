@@ -82,7 +82,7 @@ vector<ll> euler_phi(ll lo, ll hi) { // phi(n) for all n in [lo, hi)
 
   for (ll p: ps) {
     for (ll k = ceil(1.0*lo/p)*p; k < hi; k += p) {
-      if (res[k-lo] <= 1) continue;
+      if (res[k-lo] < p) continue;
       phi[k-lo] *= (p - 1);
       res[k-lo] /= p;
       while (res[k-lo] > 1 && res[k-lo] % p == 0) {
@@ -116,5 +116,4 @@ int main() {
     for (int n = lo; n < hi; ++n)
       if (x[n-lo] != euler_phi(n)) cout << "!!" << endl;
   }
-  cout << t1 << " / " << t2 << endl;
 }
