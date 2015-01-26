@@ -8,10 +8,14 @@
 //
 // Complexity:
 //   euler_phi(n):     O(sqrt(n)) by trial division.
-//   euler_phi(lo,hi): O((hi-lo) log(hi) loglog(hi)) by prime sieve.
+//   euler_phi(lo,hi): O((hi-lo) loglog(hi)) by prime sieve.
 //
 // Verified:
 //   SPOJ 22268
+//
+// Note:
+//   Complexity of sieve ver. equals to the sum of exponents in hi!/lo!.
+//   This is known to be O(hi loglog hi - lo loglog lo).
 
 #include <iostream>
 #include <vector>
