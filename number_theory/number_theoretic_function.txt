@@ -1,0 +1,38 @@
+A function f is called "number theoretic" or "multiplicative" if f(nm) = f(n) f(m) where n and m are coprime.
+
+Any number theoretic function can be computed in
+  1) O(sqrt(n)) for a certain n.
+  2) O((hi-lo) loglog hi) for n in [lo,hi).
+  
+
+  
+1) 
+  f(n) = 1;
+  for p = 1 ... sqrt(n):
+    if n % p == 0: 
+      q = 1
+      while (n % k == 0) 
+        q *= p;
+        n /= p;
+      f(n) *= f(q) // q is a prime power
+  
+  Complexity: 
+    increment of p: O(sqrt(n))
+    division by p: O(log n)
+    ==> O(sqrt(n)).
+
+2) 
+  f(n) = 1 for all n in [lo, hi)
+  r(n) = n for all n in [lo, hi)
+  for p in primes:
+    for n in [lo,hi) such that n%p == 0:
+      if r(n) < p: break;
+      q = 1
+      while r(n) % p == 0:
+        q *= p
+        r(n) /= p
+      f(n) *= f(q)
+  
+  Complexity:
+    division by p: sum of exponents in n!, which is known to be O(n log log n)
+    ==> O(n log log n).
