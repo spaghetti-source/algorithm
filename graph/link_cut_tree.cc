@@ -1,5 +1,5 @@
 // 
-// Link Cut Tree (Slator-Tarjan)
+// Link Cut Tree
 //
 // Decription:
 //   It maintains rooted forests with link/cut operations
@@ -14,6 +14,10 @@
 // Complexity:
 //   O(log n), amortized.
 //
+// References:
+//   D. D. Sleator and R. E. Tarjan (1983):
+//   A Data Structure for Dynamic Trees.
+//   Journal oF Computer and System Sciences, vol. 26, no. 3, pp. 362-391.
 
 #include <iostream>
 #include <cstdio>
