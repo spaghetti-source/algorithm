@@ -1,9 +1,7 @@
 //
 // Randomized KD Tree (for d = 2)
 //
-//
 // Description
-//
 //   Randomized KD tree is a binary space partition tree.
 //   Each tree node has a point, direction, and two childs.
 //   The left descendants are located to the `left' of the point p
@@ -13,9 +11,7 @@
 //   By randomizing the direction, we can easily implement
 //   insertion and deletion.
 //
-//
 // Complexity
-//
 //   O(log n) insertion and deletion.
 //   O(log n) search for a random points.
 //
