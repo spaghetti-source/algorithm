@@ -1,18 +1,14 @@
 // 
 // Min-Map Heap (four heaps technique)
 //
-//
 // Description:
-//
 //   A data structure for push/min/max/popmin/popmax.
 //
 // Algorithm:
-//
 //   Maintain two min heaps (minh, minp) an two max heaps (maxh, maxp).
 //   The actual elements in the heap is (minh \cup maxh) \setminus (\minp \cup maxp).
 //   
 // Complexity:
-//
 //   Amortized O(1) for push and top, and O(log n) for pop. 
 //
 
