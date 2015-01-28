@@ -9,11 +9,23 @@
 //   - sum_in_component(u): return sum of all values in the component
 //
 // Algorithm:
-//   maintain euler tours by splay trees.
+//   Maintain euler tours by splay trees.
+//   This data structure is originally proposed by Miltersen et al,
+//   and independently by Fredman and Henzinger.
 //
 // Complexity:
 //   O(log n)
+//
+// References:
+//   M. L. Fredman and M. R. Henzinger (1998):
+//   Lower bounds for fully dynamic connectivity problems in graphs.
+//   Algorithmica, vol. 22, no. 3, pp. 351–362.
+//
+//   P. B. Miltersen, S. Subramanian, J. S. Vitter, and R. Tamassia (1994):
+//   Complexity models for incremental computation.
+//   Theoretical Computer Science, vol. 130. no. 1, pp. 203–236.
 
+\bibitem{old2}
 
 #include <iostream>
 #include <vector>
