@@ -1,9 +1,7 @@
 //
 // Vantage Point Tree (vp tree)
 //
-//
 // Description
-//
 //   Vantage point tree is a metric tree.
 //   Each tree node has a point, radius, and two childs.
 //   The points of left descendants are contained in the ball B(p,r)
@@ -15,26 +13,22 @@
 //   The data structure is independently proposed by J. Uhlmann and 
 //   P. N. Yianilos.
 //
-//
 // Complexity:
-//
 //   Construction: O(n log n).
 //   Search: O(log n)
 //
 //   In my implementation, its construction is few times slower than kd tree
 //   and its search is bit faster than kd tree.
 //
-//
 // References
+//   J. Uhlmann (1991): 
+//   Satisfying General Proximity/Similarity Queries with Metric Trees.
+//   Information Processing Letters, vol. 40, no. 4, pp. 175--179.
 //
-//   [1] Jeffrey Uhlmann (1991): 
-//       "Satisfying General Proximity/Similarity Queries with Metric Trees",
-//       Information Processing Letters, vol. 40, no. 4, pp. 175--179.
-//
-//   [2] Peter N. Yianilos (1993): 
-//       "Data structures and algorithms for nearest neighbor search in general metric spaces",
-//       in Proceedings of the 4th Annual ACM-SIAM Symposium on Discrete algorithms,
-//       Society for Industrial and Applied Mathematics Philadelphia, PA, USA. pp. 311--321. 
+//   Peter N. Yianilos (1993): 
+//   Data structures and algorithms for nearest neighbor search in general metric spaces.
+//   in Proceedings of the 4th Annual ACM-SIAM Symposium on Discrete algorithms,
+//   Society for Industrial and Applied Mathematics Philadelphia, PA, USA. pp. 311--321. 
 //
 #include <iostream>
 #include <vector>
