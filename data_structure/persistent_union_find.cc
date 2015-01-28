@@ -1,7 +1,6 @@
 // 
 // Persistence Union Find
 //
-//
 // Description:
 //   Use persistent array instead of standard array in union find data structure
 //
