@@ -1,7 +1,6 @@
 // 
 // Persistent Array (sqrt decomposition)
 //
-//
 // Description:
 //   An array with O(sqrt(n)) operations (inc. copy)
 //
