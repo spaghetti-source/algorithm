@@ -1,9 +1,7 @@
 // 
 // Zero-suppressed binary decision diagram with family algebra operations
 //
-//
 // Description: 
-//
 //   ZDD maintains a set of sets of integers. Possible operations are
 //     - cup(A, B): union of A and B              { 1, 12, 123 } cup { 1, 23 } = { 1, 12, 123, 23 } 
 //     - cap(A, B): intersection of A and B       { 1, 12, 123 } cap { 12 } = { 12 }
@@ -13,14 +11,10 @@
 //     - mod(A, B): reminder of A and B           { 1, 12, 123 } mod { 12 } = { 1 }
 //     - count(A) : the number of sets in A
 //
-//
 // Complexity:
-//
 //   O( #essentially disjoint subsets ).
 //
-//
 // References: 
-//
 //   S. Minato (1993): 
 //     Zero-suppressed BDDs for set manipulation in combinatorial problems.
 //     Proceedings of the 30st annual Design Automation Conference, pp. 272-277.
