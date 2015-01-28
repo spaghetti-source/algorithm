@@ -1,3 +1,7 @@
+//
+// Union Find data structure
+//
+
 struct union_find {
   vector<int> p; 
   union_find(int n) : p(n, -1) { };
