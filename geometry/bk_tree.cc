@@ -1,9 +1,7 @@
 //
 // Burkhard-Keller Tree (metric tree)
 //
-// 
 // Description:
-//
 //   Let V be a (finite) set, and d: V x V -> R be a metric.
 //   BK tree supports the following operations:
 //     - insert(p): insert a point p, O((log n)^2)
@@ -12,7 +10,6 @@
 // Remark:
 //   To delete elements and/or rebalance the tree,
 //   we can use the same technique as the scapegoat tree.
-//
 // 
 // Reference
 //   W. Burkhard and R. Keller (1973):
