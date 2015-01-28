@@ -3,7 +3,7 @@
 //
 // Description:
 //   In a SAT problem, if all clauses contains at most one positive literals,
-//   this problem is called a Horn-SAT, and solved in linear time.
+//   this problem is called a Horn-SAT, and solved in linear time. 
 //
 // Algorithm:
 //   If there is no singleton clause, by assigning false for all literals,
