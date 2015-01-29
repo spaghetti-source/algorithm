@@ -1,5 +1,5 @@
 //
-// Divisor summatory function
+// Divisor function
 //
 // Description:
 //     sigma(n) = sum[n % d == 0] d
@@ -66,7 +66,7 @@ vector<ll> divisor_sigma(ll lo, ll hi) { // sigma(n) for all n in [lo, hi)
   iota(all(res), lo);
 
   for (ll p: ps) {
-    for (ll k = (ll)ceil(1.0*lo/p)*p; k < hi; k += p) {
+    for (ll k = ((lo+(p-1))/p)*p; k < hi; k += p) {
       ll b = 1;
       while (res[k-lo] > 1 && res[k-lo] % p == 0) {
         res[k-lo] /= p; 
