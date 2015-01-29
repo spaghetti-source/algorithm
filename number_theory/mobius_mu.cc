@@ -79,7 +79,7 @@ vector<ll> mobius_mu(ll lo, ll hi) { // phi(n) for all n in [lo, hi)
   iota(all(res), lo);
 
   for (ll p: ps) {
-    for (ll k = ceil(1.0*lo/p)*p; k < hi; k += p) {
+    for (ll k = ((lo+(p-1))/p)*p; k < hi; k += p) {
       mu[k-lo] = -mu[k-lo];
       if (res[k-lo] % p == 0) {
         res[k-lo] /= p;
