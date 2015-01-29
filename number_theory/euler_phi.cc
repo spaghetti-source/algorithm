@@ -81,7 +81,7 @@ vector<ll> euler_phi(ll lo, ll hi) { // phi(n) for all n in [lo, hi)
   iota(all(res), lo);
 
   for (ll p: ps) {
-    for (ll k = ceil(1.0*lo/p)*p; k < hi; k += p) {
+    for (ll k = ((lo+(p-1))/p)*p; k < hi; k += p) {
       if (res[k-lo] < p) continue;
       phi[k-lo] *= (p - 1);
       res[k-lo] /= p;
