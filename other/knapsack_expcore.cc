@@ -29,6 +29,11 @@
 //
 // Verified:
 //   SPOJ3321.
+//
+// References:
+//   H. Kellerer, U. Pferschy, and D. Pisinger (2004):
+//   Knapsack problems.
+//   Springer Science & Business Media.
 
 #include <iostream>
 #include <cstdio>
