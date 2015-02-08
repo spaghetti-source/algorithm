@@ -2,8 +2,8 @@
 // Interval Scheduling (weighted)
 //
 // Description:
-//   We are given a set of intervals [b_i, e_i] with weight w_i,
-//   i = 1, ..., n. Find a set of intervals with maximum weight..
+//   We are given a set of intervals [b_i, e_i] with weight w_i, i = 1, ..., n.
+//   Find a set of disjoint intervals with maximum weight.
 //
 // Algorithm:
 //   Dynamic programming. Suppose e_1 <= e_2 <= ... <= e_n.
