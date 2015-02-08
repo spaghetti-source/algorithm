@@ -3,7 +3,7 @@
 //
 // Description:
 //   We are given a set of intervals [b_i, e_i], i = 1, ..., n.
-//   Find a set of intervals with maximum cardinality.
+//   Find a set of disjoint intervals with maximum cardinality.
 //
 // Algorithm:
 //   Greedy. Sort by e_i and then take the intervals greedily.
