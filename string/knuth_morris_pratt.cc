@@ -17,7 +17,7 @@
 //   SPOJ 21524
 // 
 // Comment:
-//   BM is often considered faster than KMP.
+//   KMP is often considered slower than BM.
 //   However, in the programming contest setting, 
 //   these are equally fast.
 //
