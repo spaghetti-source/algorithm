@@ -2,16 +2,15 @@
 // Minimum Feedback Arc Set
 //
 // Description:
-//   We are given a weighted graph G = (V, E; w).
+//   We are given an undirected weighted graph G = (V, E; w).
 //   A set of edges F is said to be a feedback arc set if
-//   (V, E-F) is has no cycle.
+//   (V, E-F) is has no cycles.
 //   The problem is to find a minimum weight feedback arc set.
 //
 // Algorithm:
 //   Min FAS problem is equivalent to find an ordering p 
 //   that minimizes the total weight of inconsistence edges:
 //     \sum { w(u,v) : u <_p v }.
-//
 //   This gives a dynamic programming solution.
 //   For a subset S of V, let f(S) be the value of MFAS for G(S).
 //   Then we have
@@ -20,7 +19,7 @@
 //   adding largest element u to the optimal solution S-u.
 //   
 // Complexity:
-//   O(m 2^S).
+//   O(m 2^n).
 //
 // References:
 //   V. Raman and S. Saurabh (2007):
