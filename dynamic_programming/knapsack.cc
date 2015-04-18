@@ -37,10 +37,6 @@
 
 using namespace std;
 
-#define fst first
-#define snd second
-#define all(c) ((c).begin()), ((c).end())
-
 // weight DP
 // Complexity: O(nc)
 //
