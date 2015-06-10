@@ -13,7 +13,7 @@
 //     3) branch and search.
 //  
 // Complexity:
-//   O(n^n) in worst case. 
+//   O(2^n) in worst case. 
 //   This implementation is practical for n = 100.
 //
 // Verified:
