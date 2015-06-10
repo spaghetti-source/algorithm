@@ -13,8 +13,8 @@
 //     3) branch and search.
 //  
 // Complexity:
-//   O(n^2) in worst case. 
-//   In this implementation, n = 100 is practical.
+//   O(n^n) in worst case. 
+//   This implementation is practical for n = 100.
 //
 // Verified:
 //   Uniform 3-SAT instances from http://www.cs.ubc.ca/~hoos/SATLIB/benchm.html
