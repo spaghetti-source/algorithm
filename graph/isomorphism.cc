@@ -15,7 +15,7 @@
 //   O(d n!) time, O(n) space.
 //
 // Verify:
-//   ToDo: SPOJ401
+//   SPOJ401
 //
 // References:
 //   L. P. Cordella, P. Foggia, C. Sansone, and M. Vento (2004):
