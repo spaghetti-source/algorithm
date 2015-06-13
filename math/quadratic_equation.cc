@@ -16,7 +16,7 @@
 #include <cmath> 
 #include <cstdio>
 #include <cstring>
-
+ 
 using namespace std;
 #define fst first
 #define snd second
