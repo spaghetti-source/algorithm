@@ -9,8 +9,9 @@
 //   Cographs are also characterized by P_4-free graphs.
 //
 // Algorithm:
-//    By using the above constructive characterization, i.e.,
+//    By using the above constructive characterization, we have
 //      G is a cograph iff all connected components of G~ are cographs.
+//    This yields a polynomial time algorithm.
 //    Note that there are O(n + m) algorithm for this problem
 //    by using lexicographic BFS.
 //
