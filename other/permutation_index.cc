@@ -15,7 +15,7 @@
 //     for i = 0, ..., n-1: 
 //       d[i] = the number of active numbers j < x[i] 
 //       deactivate x[i]
-//   
+//
 //   unindex_perm:
 //     for i = 0, ..., n-1:
 //       x[i] = d[i]-th active element
