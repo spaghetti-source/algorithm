@@ -17,7 +17,7 @@
 //     while n > 1:
 //       swap(x[n-1], x[d_{n-1}]
 //       --n;
-// 
+//
 // Complexity:
 //   O(n) time, O(n) space.
 //   
