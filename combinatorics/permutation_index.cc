@@ -2,7 +2,7 @@
 // Permutation Index
 //
 // Description:
-//   index_perm computes the index of the permutation x over [0,n),
+//   index_perm computes the lexicographical index of the permutation x of [0,n),
 //   i.e., it gives k such that x = next_permutation^k [0,n).
 //   
 //   unindex_perm is the inverse function of index_perm.
