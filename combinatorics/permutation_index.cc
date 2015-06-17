@@ -20,7 +20,7 @@
 //     for i = 0, ..., n-1:
 //       x[i] = d[i]-th active element
 //       deactivate x[i]
-//       
+//   
 //   Both can be computed in O(n log n) time by using Fenwick tree.
 // 
 // Complexity:
