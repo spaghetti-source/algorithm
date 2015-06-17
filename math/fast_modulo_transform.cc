@@ -16,11 +16,17 @@
 // Note:
 //   We assume n is a power of 2 and n < 2^23 (>= 8*10^6)
 //
+// Verify:
+//   SPOJ 235: Very Fast Multiplication (fmt is 3 times slower than fft)
 
 #include <iostream>
 #include <vector>
 #include <cstdio>
 #include <algorithm>
+#include <cmath>
+#include <complex>
+#include <string>
+#include <cstring>
 #include <functional>
 #include <cassert>
 
@@ -144,6 +150,7 @@ vector<ll> convolution_n(vector<ll> a, vector<ll> b, ll mod) {
 }
 
 
+/*
 // === tick a time ===
 #include <ctime>
 double tick() {
@@ -169,5 +176,55 @@ int main() {
 //    cout << c << endl;
 //    cout << d << endl;
     if (c != d) break;
+  }
+}
+*/
+const int WIDTH = 5;
+const long long RADIX = 100000; // = 10^WIDTH
+
+vector<ll> parse(const char s[]) {
+  int n = strlen(s);
+  int m = (n + WIDTH-1) / WIDTH;
+  vector<ll> v(m);
+  for (int i = 0; i < m; ++i) {
+    int b = n - WIDTH * i, x = 0;
+    for (int a = max(0, b - WIDTH); a < b; ++a)
+      x = x * 10 + s[a] - '0';
+    v[i] = x;
+  }
+  v.push_back(0);
+  return v;
+}
+
+void print(const vector<ll> &v) {
+  int i, N = v.size();
+  vector<long long> digits(N + 1, 0);
+
+  for (i = 0; i < N; i++) {
+    digits[i] = v[i];
+  }
+  long long c = 0;
+  for (i = 0; i < N; i++) {
+    c += digits[i];
+    digits[i] = c % RADIX;
+    c /= RADIX;
+  }
+  for (i = N-1; i > 0 && digits[i] == 0; i--);
+  printf("%lld", digits[i]);
+  for (i--; i >= 0; i--)
+    printf("%.*lld", WIDTH, digits[i]);
+  printf("\n");
+}
+
+int main() {
+  static char a_str[310000], b_str[310000];
+
+  int T; scanf("%d", &T);
+  while (T--) {
+    scanf("%s %s", a_str, b_str);
+    vector<ll> A = parse(a_str);
+    vector<ll> B = parse(b_str);
+    vector<ll> C = convolution(A, B, 9000000000000000000ll);
+    print(C);
   }
 }
