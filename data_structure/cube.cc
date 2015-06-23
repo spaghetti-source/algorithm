@@ -1,8 +1,8 @@
 //
-// Cube container
+// Cube data structure
 //
 // Descrption:
-//   It has a cube container which has six faces on
+//   A data structure for cube has six faces on
 //   front, up, down, left, right, and bottom.
 //   It admits the following three rotations
 //     rotX: front -> up    -> back  -> down
