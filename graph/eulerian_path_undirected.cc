@@ -56,12 +56,12 @@ struct graph {
     path.push_back(u);
   }
   vector<int> eulerian_path() {
-    int m = 0, s = 0;
+    int m = 0, s = -1;
     for (int u = 0; u < n; ++u) {
       m += adj[u].size();
       if (adj[u].size() % 2 == 1) s = u;
     }
-    path.clear(); visit(s);
+    path.clear(); if (s >= 0) visit(s);
     if (path.size() != m/2 + 1) return {};
     return path;
   }
