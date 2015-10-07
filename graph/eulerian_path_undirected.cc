@@ -1,6 +1,6 @@
 // 
 // Undirected Eulerian Path (Hierholzer's algorithm)
-//
+// 
 // Description:
 //   A path (walk) P is Eulerian if P visits all edges exactly once.
 //   A graph admits Eulerian path if and only if there are exactly two
