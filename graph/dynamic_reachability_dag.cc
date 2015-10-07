@@ -48,7 +48,6 @@ struct dag_reachability {
     return src == dst || parent[src][dst] >= 0;
   }
   bool add_edge(int src, int dst) {
-    //cout << "add_edge(" << src << "," << dst << ")" << endl;
     if (is_reachable(dst, src)) return false; // break DAG condition
     if (is_reachable(src, dst)) return true;  // no-modification performed
     for (int p = 0; p < n; ++p) 
@@ -56,9 +55,7 @@ struct dag_reachability {
         meld(p, dst, src, dst);
     return true;
   }
-  // T(root) 中の u に T(sub) 中の v 以下をマージ
   void meld(int root, int sub, int u, int v) {
-    //cout << "meld(" << root << "," << sub << "," << u << "," << v << ")" << endl;
     parent[root][v] = u;
     child[root][u].push_back(v);
     for (int c: child[sub][v]) 
