@@ -1,5 +1,5 @@
 // 
-// Undirected Eulerian Path (Hierholzer)
+// Undirected Eulerian Path (Hierholzer's algorithm)
 //
 // Description:
 //   A path (walk) P is Eulerian if P visits all edges exactly once.
@@ -7,18 +7,13 @@
 //   odd-degree vertices (they are initial and terminal of a path).
 //
 // Algorithm:
-//   Hierholzer's algorithm. Let s be the initial of the path.
-//   The algorithm performs DFS from s. 
+//   Hierholzer's algorithm performs DFS from the initial vertex.
 //
 // Complexity:
 //   O(n + m)
 //
 // Verified:
 //   UVA 10054 The Necklace (tour)
-//
-// References:
-//   gg
-// 
 //
 
 #include <iostream>
