@@ -16,6 +16,14 @@
 //   O(n^3).
 //   Much faster than the Kuhn-Munkres algorithm.
 //
+// Note:
+//   It finds minimum cost maximal matching.
+//   To find the minimum cost non-maximal matching,
+//   we add n dummy vertices to the right side.
+//
+// Verified: 
+//   SPOJ 286: Selfish City
+//
 // References:
 //   R. Jonker and A. Volgenant (1987):
 //   A shortest augmenting path algorithm for dense and sparse linear assignment problems.
@@ -46,6 +54,7 @@ using namespace std;
 
 typedef int value_type;
 const value_type inf = 99999999;
+
 value_type min_assignment(const vector<vector<value_type>> &c) {
   const int n = c.size(), m = c[0].size(); // assert(n <= m);
   vector<value_type> v(m), dist(m);        // v: potential
@@ -94,7 +103,8 @@ aug:for(int k = 0; k < l; ++k)
       v[index[k]] += dist[index[k]] - w;
     int i;
     do {
-      matchR[j] = i = prev[j]; swap(j, matchL[i]);
+      matchR[j] = i = prev[j]; 
+      swap(j, matchL[i]);
     } while (i != f);
   }
   value_type opt = 0;
@@ -103,34 +113,15 @@ aug:for(int k = 0; k < l; ++k)
   return opt;
 }
 
-
-// === tick a time ===
-#include <ctime>
-double tick() {
-  static clock_t oldtick;
-  clock_t newtick = clock();
-  double diff = 1.0*(newtick - oldtick) / CLOCKS_PER_SEC;
-  oldtick = newtick;
-  return diff;
-}
-
-int seed;
-vector<vector<int>> matrix() {
-  srand( seed );
-  int n = 2000; 
-  int m = 3000;
-  vector<vector<int>> c(n, vector<int>(m));
-  for (int i = 0; i < n; ++i)
-    for (int j = 0; j < m; ++j)
-      c[i][j] = 1 + rand() % 1000;
-  return c;
-}
 int main() {
-  seed = time(0);
-  cout << "seed = " << seed << endl;
-
-  vector<vector<int>> a = matrix();
-  tick();
-  cout << min_assignment(a) << endl;
-  cout << tick() << endl;
+  int ncase;
+  scanf("%d", &ncase);
+  for (int icase = 0; icase < ncase; ++icase) {
+    int n, m; scanf("%d %d", &n, &m);
+    vector<vector<int>> c(n, vector<int>(m+n, 0));
+    for (int s, t, u; scanf("%d %d %d", &s, &t, &u) && s; ) {
+      c[s-1][t-1] = -u;
+    }
+    printf("%d\n", -min_assignment(c));
+  }
 }
