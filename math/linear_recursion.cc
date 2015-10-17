@@ -1,73 +1,80 @@
+// 
+// Linear Recurrence Solver
 //
-// Fast linear recursion computation
+// Description:
+//   Consider 
+//     x[i+n] = a[0] x[i] + a[1] x[i+1] + ... + a[n-1] x[i+n-1].
+//   with initial solution x[0], x[1], ..., x[n-1].
+//   We compute k-th term of x in O(n^2 log k) time.
 //
-//
-// Description
-//   Compute m-th term of the sequence
-//   x(n+k) = c(0) x(n) + c(1) x(n+1) + ... + c(k-1) x(n+k-1).
-//
-//
-// Algorithm
-//   Compute A^m x(0), where A is a companion matrix.
-//   Note that we can compute a 2-power of companion matrix in O(k^2 log n) time;
-//   let B := A^n then C = B^2 is obtained by
-//     C(1) = B(1) * B, 
-//     C(2) = C(1) * A,
-//     ..., 
-//     C(k) = C(k-1) A.
-//
+// Algorithm:
+//   Since x[k] is linear in x[0], ..., x[n-1],
+//   there exists function f: Z -> R^n such that
+//     x[k] = f(k)[0] x[0] + ... + f(k)[n-1] x[n-1].
+//   Here, f satisfies the following identities:
+//     x[2k] = f(k)[0] x[k] + ... + f(k)[n-1] x[k+n-1]
+//           = f(k)[0] (f(k)[0] x[0] + ... + f(k)[n-1] x[n-1])
+//           + f(k)[1] (f(k)[0] x[1] + ... + f(k)[n-1] x[n-1+1])
+//           + ...
+//           = sum{0<=i<n, 0<0j<n} f(k)[i] f(k)[j] x[i+j].
+//           = t[0] x[0] + ... + t[2*n-1] x[2*n-1].
+//   Also, we have
+//     x[n+k] = a[0] x[n] + ... + a[n+k-1] x[n+k-1], 
+//   thus
+//     t[0] x[0] + ... + t[2*n-1] x[2*n-1]
+//     = t[0] x[0] + ... + t[2*n-1] (a[0] x[n] + ... + a[n+k-1] x[n+k-1])
+//     = t'[0] x[0] + ... + t[2*n-2]' x[2*n-2].
+//     ...
+//     = t''[0] x[0] + ... + t''[n-1] x[n-1].
+//   This means, we can compute f(2*k) from f(k) in O(n^2) time.      
+//   
+// Complexity:
+//   O(n^2 log k) time, O(n log k) space.
 //
 #include <iostream>
 #include <vector>
 #include <cstdio>
-#include <cstdlib>
-#include <map>
-#include <cmath>
-#include <cstring>
-#include <functional>
 #include <algorithm>
-#include <unordered_map>
+#include <functional>
 
 using namespace std;
 
-vector<int> operator*(const vector<int> &x, const vector<vector<int>> &A) {
-  vector<int> y(A[0].size());
-  for (size_t j = 0; j < y.size(); ++j) 
-    for (size_t i = 0; i < x.size(); ++i) 
-      y[j] += x[i] * A[i][j];
-  return y;
-}
-vector<int> operator*(const vector<vector<int>> &A, const vector<int> &x) {
-  vector<int> y(A[0].size());
-  for (size_t i = 0; i < y.size(); ++i) 
-    for (size_t j = 0; j < x.size(); ++j) 
-      y[i] += A[i][j] * x[j];
-  return y;
-}
-// x[m+k] = c[0] x[m] + c[1] x[m+1] + ... + c[k-1] x[m+k-1]
-int linear_recurrence(vector<int> c, vector<int> x, int m) {
-  size_t k = c.size();
-  vector<vector<int>> B(k, vector<int>(k));
-  for (size_t i = 0; i+1 < k; ++i) 
-    B[i][i+1] = 1;
-  B[k-1] = c;
-  for (; m > 0; m /= 2) {
-    if (m % 2) x = B * x;
-    B[0] = B[0] * B;
-    for (size_t i = 1; i < k; ++i) {
-      for (size_t j = 0; j < k; ++j) { // B[i] = B[i-1] * A
-        B[i][j] = B[i-1][k-1] * c[j]; 
-        if (j > 0) B[i][j] += B[i-1][j-1];
-      }
+#define fst first
+#define snd second
+#define all(c) ((c).begin()), ((c).end())
+
+int linear_recurrence(vector<int> a, vector<int> x, int k) {
+  int n = a.size();
+  vector<int> t(2*n+1);
+
+  function<vector<int> (int)> rec = [&](int k) {
+    vector<int> c(n);
+    if (k < n) c[k] = 1;
+    else {
+      vector<int> b = rec(k / 2);
+      fill(all(t), 0);
+      for (int i = 0; i < n; ++i) 
+        for (int j = 0; j < n; ++j)
+          t[i+j+(k&1)] += b[i]*b[j];
+      for (int i = 2*n-1; i >= n; --i) 
+        for (int j = 0; j < n; j++) 
+          t[i-n+j] += a[j]*t[i];
+      for (int i = 0; i < n; ++i) 
+        c[i] = t[i];
     }
-  }
-  return x[0];
+    return c;
+  };
+  vector<int> c = rec(k);
+  int ans = 0;
+  for (int i = 0; i < x.size(); ++i) 
+    ans += c[i]*x[i];
+  return ans;
 }
 
+
 int main() {
-  vector<int> c(3); c[0] = 4; c[1] = 5; c[2] = 6;
-  vector<int> x(3); x[0] = 0; x[1] = 1; x[2] = 3;
-  for (int m; cin >> m; ) {
-    cout << linear_recurrence(c, x, m) << endl;
-  }
+  // x[n+k] = x[n] + 2*x[n+1] + 3*x[n+2];
+  // x[0] = 6, x[1] = 5, x[2] = 4.
+  // 10-th term = 220696
+  cout << linear_recurrence({1,2,3}, {6,5,4}, 10) << endl;
 }
