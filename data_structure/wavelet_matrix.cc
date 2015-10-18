@@ -2,8 +2,8 @@
 // Non-succinct Wavelet matrix
 //
 // Description:
-//   Wavelet matrix is a data structure for a list of nonnegative integers
-//   that admits the following queries in O(BIT_SIZE):
+//   Wavelet matrix is a data structure for a list of integers
+//   in [0, 2^BIT) that admits the following queries in O(BIT):
 //     1) rank(a,k)    = |{ i in [0,k) : x[i] == a }|
 //     2) select(a,k)  = min { i in N : rank(a,i) >= k }
 //   Usually, wavelet matrix is a succinct data structure;
@@ -14,9 +14,8 @@
 //   See Claude, Navarro, and Ordonez.
 // 
 // Complexity:
-//   Let D be the size of domain;
-//   O(log(D) n) for construction,
-//   O(log(D)) for rank and select.
+//   O(log(BIT) n) for construction,
+//   O(log(BIT)) for rank and select.
 //
 // References:
 //   Francisco Claude, Gonzalo Navarro, and Alberto Ordonez (2015):
