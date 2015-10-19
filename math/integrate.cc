@@ -5,11 +5,18 @@
 //   It computes int_a^b f(x) dx by using transformation
 //     x = tanh(pi/2 sinh(t))
 //   with the trapezoital rule. 
-//   For sufficiently regular functions, this is the most accurate
+//   For analytic functions, this is the most accurate
 //   formula in theory.
 //
 // Complexity:
 //   Accuracy is exp(-O(N/log N)) with N function evaluations.
+//
+// Remark:
+//   In general, if f is smooth upto k-th derivative,
+//   O(1/N^(k+1)) is best possible.
+//   If you know non-smooth points of f, you have to
+//   split f by these points.
+//
 //
 #include <iostream>
 #include <vector>
