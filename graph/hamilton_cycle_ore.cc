@@ -2,9 +2,9 @@
 // Hamilton Cycle for graphs with Ore condition
 //
 // Description:
-//   An undirected graph satisfies the Woodall condition if
+//   When an undirected graph satisfies the Ore condition,
 //     d(u) + d(v) >= n, (u,v) not in E.
-//   Such graph always admits Hamiltonian cycle.
+//   it has a Hamiltonian cycle.
 //
 // Algorithm:
 //   Palmer's construction.
