@@ -4,7 +4,6 @@
 // Description:
 //   Compute the maximum cardinality matching for bipartite graph.
 //
-//
 // Algorithm:
 //   The algorithm iterates following procedures:
 //     (1) BFS from the source to get the distance to the sink.
@@ -18,10 +17,8 @@
 // Complexity:
 //   O(m \sqrt{n}) time
 //
-//
 // Verified:
 //   SPOJ 4206: Fast Maximum Matching
-//
 //
 // References:
 //   J. E. Hopcroft and R. M. Karp (1973):
@@ -100,7 +97,7 @@ int main() {
   for (int i = 0; i < m; ++i) {
     int u, v;
     scanf("%d %d", &u, &v);
-    g.add_edge(u-1, v-1);
+    g.add_edge(u, v);
   }
   printf("%d\n", g.maximum_matching());
 }
