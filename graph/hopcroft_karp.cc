@@ -26,7 +26,7 @@
 // References:
 //   J. E. Hopcroft and R. M. Karp (1973):
 //   An n^5/2 algorithm for maximum matchings in bipartite graphs.
-//   SIAM Journal on Computing, vol. 2, no. 4, pp. 225-231.
+//   SIAM Journal on Computing, vol.2, no.4, pp.225-231.
 //
 
 #include <iostream>
@@ -40,66 +40,67 @@
 
 using namespace std;
 
-struct edge {
-  int src, dst;
-};
-int L, R;
-vector<vector<edge>> adj;
-void add_edge(int u, int v) {
-  v += L;
-  adj[u].push_back({u, v});
-  adj[v].push_back({v, u});
-}
-vector<int> mate, level;
-bool levelize() { 
-  level.assign(L, -1);
-  queue<int> Q;
-  for (int u = 0; u < L; ++u) {
-    if (mate[u] == -1) {
-      Q.push(u); 
-      level[u] = 0;
-    }
+struct graph {
+  int L, R;
+  vector<vector<int>> adj;
+  graph(int L, int R) : L(L), R(R), adj(L+R) { }
+  void add_edge(int u, int v) {
+    adj[u].push_back(v+L);
+    adj[v+L].push_back(u);
   }
-  while (!Q.empty()) {
-    int u = Q.front(); Q.pop();
-    for (auto e: adj[u]) {
-      int v = mate[e.dst];
-      if (v < 0) return true;
-      if (level[v] < 0) {
-        Q.push(v); 
-        level[v] = level[u] + 1;
+  int maximum_matching() {
+    vector<int> level(L), mate(L+R, -1);
+
+    function<bool(void)> levelize = [&]() { // BFS
+      queue<int> Q;
+      for (int u = 0; u < L; ++u) {
+        level[u] = -1;
+        if (mate[u] < 0) {
+          level[u] = 0;
+          Q.push(u); 
+        }
       }
-    }
+      while (!Q.empty()) {
+        int u = Q.front(); Q.pop();
+        for (int w: adj[u]) {
+          int v = mate[w];
+          if (v < 0) return true;
+          if (level[v] < 0) {
+            level[v] = level[u] + 1;
+            Q.push(v); 
+          }
+        }
+      }
+      return false;
+    };
+    function<bool(int)> augment = [&](int u) { // DFS
+      for (int w: adj[u]) {
+        int v = mate[w];
+        if (v < 0 || (level[v] > level[u] && augment(v))) {
+          mate[u] = w;
+          mate[w] = u;
+          return true;
+        }
+      }
+      return false;
+    };
+    int match = 0;
+    while (levelize()) 
+      for (int u = 0; u < L; ++u) 
+        if (mate[u] < 0 && augment(u)) 
+          ++match;
+    return match;
   }
-  return false;
-}
-bool augment(int u) {
-  for (auto e: adj[u]) {
-    int v = mate[e.dst];
-    if (v < 0 || (level[v] > level[u] && augment(v))) {
-      mate[e.src] = e.dst;
-      mate[e.dst] = e.src;
-      return true;
-    }
-  }
-  return false;
-}
-int maximum_matching() {
-  mate.assign(L+R, -1);
-  int match = 0;
-  while (levelize()) 
-    for (int u = 0; u < L; ++u) 
-      if (mate[u] == -1 && augment(u)) ++match;
-  return match;
-}
+};
 
 int main() {
   int L, R, m; 
   scanf("%d %d %d", &L, &R, &m);
+  graph g(L, R);
   for (int i = 0; i < m; ++i) {
     int u, v;
     scanf("%d %d", &u, &v);
-    add_edge(u-1, v-1);
+    g.add_edge(u-1, v-1);
   }
-  printf("%d\n", maximum_matching());
+  printf("%d\n", g.maximum_matching());
 }
