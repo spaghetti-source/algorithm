@@ -1,5 +1,5 @@
 // 
-// Boolean matrix
+// Very fast boolean matrix
 //
 // Description:
 //   This admits very fast operations for boolean matrices.
@@ -63,25 +63,27 @@ mat add(mat A, const mat &B) {
       A.x[i][j] |= B.x[i][j];
   return A;
 }
-// 64 x 64 matrix product in 160 operations. 
+// 8 x 8 matrix product in 128 bit operations. 
+// (cf: naive method requires 1024 ops)
 ull mul(ull a, ull b) { // C[i][j] |= A[i][k] & B[k][j]
-  ull x, y, c = 0, u = 0x101010101010101, v = 0xff;
-  x = a&u; u<<=1; x |= (x<<1); x |= (x<< 2); x |= (x << 4); 
-  y = b&v; v<<=8; y |= (y<<8); y |= (y<<16); y |= (y <<32); c |= (x&y);
-  x = a&u; u<<=1; x |= (x>>1); x |= (x<< 2); x |= (x << 4);
-  y = b&v; v<<=8; y |= (y>>8); y |= (y<<16); y |= (y <<32); c |= (x&y);
-  x = a&u; u<<=1; x |= (x<<1); x |= (x>> 2); x |= (x << 4);
-  y = b&v; v<<=8; y |= (y<<8); y |= (y>>16); y |= (y <<32); c |= (x&y);
-  x = a&u; u<<=1; x |= (x>>1); x |= (x>> 2); x |= (x << 4);
-  y = b&v; v<<=8; y |= (y>>8); y |= (y>>16); y |= (y <<32); c |= (x&y);
-  x = a&u; u<<=1; x |= (x<<1); x |= (x<< 2); x |= (x >> 4);
-  y = b&v; v<<=8; y |= (y<<8); y |= (y<<16); y |= (y >>32); c |= (x&y);
-  x = a&u; u<<=1; x |= (x>>1); x |= (x<< 2); x |= (x >> 4);
-  y = b&v; v<<=8; y |= (y>>8); y |= (y<<16); y |= (y >>32); c |= (x&y);
-  x = a&u; u<<=1; x |= (x<<1); x |= (x>> 2); x |= (x >> 4);
-  y = b&v; v<<=8; y |= (y<<8); y |= (y>>16); y |= (y >>32); c |= (x&y);
-  x = a&u; u<<=1; x |= (x>>1); x |= (x>> 2); x |= (x >> 4);
-  y = b&v; v<<=8; y |= (y>>8); y |= (y>>16); y |= (y >>32); c |= (x&y);
+  const ull u = 0x101010101010101, v = 0xff;
+  ull x, y, c = 0;
+  x = a&(u<< 0); x |= (x<<1); x |= (x<< 2); x |= (x << 4); 
+  y = b&(v<< 0); y |= (y<<8); y |= (y<<16); y |= (y <<32); c |= (x&y);
+  x = a&(u<< 1); x |= (x>>1); x |= (x<< 2); x |= (x << 4);
+  y = b&(v<<18); y |= (y>>8); y |= (y<<16); y |= (y <<32); c |= (x&y);
+  x = a&(u<< 2); x |= (x<<1); x |= (x>> 2); x |= (x << 4);
+  y = b&(v<<16); y |= (y<<8); y |= (y>>16); y |= (y <<32); c |= (x&y);
+  x = a&(u<< 3); x |= (x>>1); x |= (x>> 2); x |= (x << 4);
+  y = b&(v<<24); y |= (y>>8); y |= (y>>16); y |= (y <<32); c |= (x&y);
+  x = a&(u<< 4); x |= (x<<1); x |= (x<< 2); x |= (x >> 4);
+  y = b&(v<<32); y |= (y<<8); y |= (y<<16); y |= (y >>32); c |= (x&y);
+  x = a&(u<< 5); x |= (x>>1); x |= (x<< 2); x |= (x >> 4);
+  y = b&(v<<40); y |= (y>>8); y |= (y<<16); y |= (y >>32); c |= (x&y);
+  x = a&(u<< 6); x |= (x<<1); x |= (x>> 2); x |= (x >> 4);
+  y = b&(v<<48); y |= (y<<8); y |= (y>>16); y |= (y >>32); c |= (x&y);
+  x = a&(u<< 7); x |= (x>>1); x |= (x>> 2); x |= (x >> 4);
+  y = b&(v<<56); y |= (y>>8); y |= (y>>16); y |= (y >>32); c |= (x&y);
   return c;
 }
 mat mul(mat A, mat B) {
