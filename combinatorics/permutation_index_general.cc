@@ -1,5 +1,5 @@
 // 
-// Permutation index of general sequence
+// Lexicographical index of a general permutation
 //
 // Description:
 //   index_perm computes the lexicographical index of a permutation x,
