@@ -37,14 +37,19 @@ using namespace std;
 #define all(c) ((c).begin()), ((c).end())
 
 typedef long long ll;
-ll inv(ll b, ll M) {
+ll mul(ll a, ll b, ll M) { // a * b (mod M)
+  ll r = a*b - (ll)((long double)(a)*b/M+.5)*M;
+  return r < 0 ? r + M: r;
+}
+ll div(ll a, ll b, ll M) { // solve b x == a (mod M)
   ll u = 1, x = 0, s = b, t = M; 
-  while (s) {
+  while (s) { // extgcd for b x + M s = t
     ll q = t / s;
     swap(x -= u * q, u);
     swap(t -= s * q, s);
   }
-  return (x %= M) >= 0 ? x : x + M;
+  if (a % t) return -1; // infeasible
+  return mul(x < 0 ? x + M : x, a / t, M); // b (xa/t) == a (mod M)
 }
 ll pow(ll a, ll b, ll M) {
   ll x = 1;
@@ -54,58 +59,59 @@ ll pow(ll a, ll b, ll M) {
   }
   return x;
 }
-// fast modulo transform
-//   (1) n = 2^k < 2^23 
-//   (2) only predetermined mod can be used
-void fmt(vector<ll> &x, ll mod, int sign = +1) {
-  int n = x.size();
-  ll h = pow(3, (mod-1)/n, mod);
-  if (sign < 0) h = inv(h, mod);
+// assume: size of a/b is power of two, mod is predetermined
+template <int mod, int sign>
+void fmt(vector<ll>& x) {
+  const int n = x.size();
+  int h = pow(3, (mod-1)/n, mod);
+  if (sign < 0) h = div(1, h, mod);
   for (int i = 0, j = 1; j < n-1; ++j) {
     for (int k = n >> 1; k > (i ^= k); k >>= 1);
     if (j < i) swap(x[i], x[j]);
   }
   for (int m = 1; m < n; m *= 2) {
-    ll w = 1, wk = pow(h, n/(2*m), mod);
+    ll w = 1, wk = pow(h, n / (2*m), mod);
     for (int i = 0; i < m; ++i) {
-      for (int j = i; j < n; j += 2*m) {
-        ll u = x[j], d = x[j+m] * w % mod;
-        if ((x[j]   = u + d) >= mod) x[j]   -= mod;
-        if ((x[j+m] = u - d) <    0) x[j+m] += mod;
+      for (int s = i; s < n; s += 2*m) {
+        ll u = x[s], d = x[s + m] * w % mod;
+        if ((x[s] = u + d) >= mod) x[s] -= mod;
+        if ((x[s + m] = u - d) < 0) x[s + m] += mod;
       }
       w = w * wk % mod;
     }
   }
-  if (sign < 0) {
-		ll n_inv = inv(n, mod);
-		for (auto& a : x) a = (a * n_inv) % mod;
+  if (sign < 0) { 
+    ll inv = div(1, n, mod);
+    for (auto &a: x) 
+      a = a * inv % mod;
   }
 }
-// convolution via fast modulo transform
-vector<ll> conv(vector<ll> x, vector<ll> y, ll mod) {
-  fmt(x, mod, +1); fmt(y, mod, +1);
-  for (int i = 0; i < x.size(); ++i) 
-    x[i] = (x[i] * y[i]) % mod;
-  fmt(x, mod, -1);
+// assume: size of a/b is power of two, mod is predetermined
+template <int mod>
+vector<ll> conv(vector<ll> a, vector<ll> b){
+  fmt<mod,+1>(a); fmt<mod,+1>(b);
+  for (int i = 0; i < a.size(); ++i) 
+    a[i] = a[i] * b[i] % mod;
+  fmt<mod,-1>(a);
+  return a;
+}
+// general convolution where mod < 2^31.
+vector<ll> conv(vector<ll> a, vector<ll> b, ll mod){
+  int n = a.size() + b.size() - 1;
+  for (int k: {1,2,4,8,16}) n |= (n >> k); ++n;
+  a.resize(n); b.resize(n);
+  const int A = 167772161, B = 469762049, C = 1224736769, D = (ll)(A) * B % mod;
+  vector<ll> x = conv<A>(a,b), y = conv<B>(a,b), z = conv<C>(a,b);
+  for (int i = 0; i < x.size(); ++i) {
+    ll X = (y[i] - x[i]) * 104391568;
+    if ((X %= B) < 0) X += B;
+    ll Y = (z[i] - (x[i] + A * X) % C) * 721017874;
+    if ((Y %= C) < 0) Y += C;
+    x[i] += A * X + D * Y;
+    if ((x[i] %= mod) < 0) x[i] += mod;
+  }
+  x.resize(n);
   return x;
-}
-// general convolution by using fmts with chinese remainder thm.
-vector<ll> convolution(vector<ll> x, vector<ll> y, ll mod) {
-  for (auto &a: x) a %= mod;
-  for (auto &b: y) b %= mod;
-  int n = x.size() + y.size() - 1, size = n - 1;
-  for (int s: {1,2,4,8,16}) size |= (size >> s);
-  size += 1;
-  x.resize(size);
-  y.resize(size);
-  ll A = 167772161, B = 469762049, C = 1224736769, D = (A*B%mod);
-  vector<ll> z(n), a = conv(x,y,A), b = conv(x,y,B), c = conv(x,y,C);
-  for (int i = 0; i < n; ++i) {
-    z[i] =  A * (104391568 * (b[i] - a[i]) % B);
-    z[i] += D * (721017874 * (c[i] - (a[i] + z[i]) % C) % C);
-    if ((z[i] = (z[i] + a[i]) % mod) < 0) z[i] += mod;
-  }
-  return z;
 }
 
 
@@ -141,7 +147,7 @@ void fmt_n(vector<ll> &a, ll mod) {
   }
   swap(a, b);
 }
-vector<ll> convolution_n(vector<ll> a, vector<ll> b, ll mod) {
+vector<ll> conv_n(vector<ll> a, vector<ll> b, ll mod) {
   vector<ll> c(a.size() + b.size() - 1);
   for (int i = 0; i < a.size(); ++i)
     for (int j = 0; j < b.size(); ++j)
@@ -149,36 +155,6 @@ vector<ll> convolution_n(vector<ll> a, vector<ll> b, ll mod) {
   return c;
 }
 
-
-/*
-// === tick a time ===
-#include <ctime>
-double tick() {
-  static clock_t oldtick;
-  clock_t newtick = clock();
-  double diff = 1.0*(newtick - oldtick) / CLOCKS_PER_SEC;
-  oldtick = newtick;
-  return diff;
-}
-
-int main() {
-  for (int iter = 2; iter < 100; ++iter) {
-    cout << iter << endl;
-    srand( iter );
-    vector<ll> a(rand() + 10), b(rand() + 10);
-    ll mod = 10000 + rand();
-    for (auto &u: a) u = rand() % mod;
-    for (auto &v: b) v = rand() % mod;
-//    cout << a << endl;
-//    cout << b << endl; 
-    vector<ll> c = convolution(a, b, mod);
-    vector<ll> d = convolution_n(a, b, mod);
-//    cout << c << endl;
-//    cout << d << endl;
-    if (c != d) break;
-  }
-}
-*/
 const int WIDTH = 5;
 const long long RADIX = 100000; // = 10^WIDTH
 
@@ -224,7 +200,7 @@ int main() {
     scanf("%s %s", a_str, b_str);
     vector<ll> A = parse(a_str);
     vector<ll> B = parse(b_str);
-    vector<ll> C = convolution(A, B, 9000000000000000000ll);
+    vector<ll> C = conv(A, B, 9000000000000000000ll);
     print(C);
   }
 }
