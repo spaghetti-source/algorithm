@@ -1,5 +1,5 @@
 // 
-// Very fast boolean matrix
+// Boolean coefficient matrix
 //
 // Description:
 //   This admits very fast operations for boolean matrices.
