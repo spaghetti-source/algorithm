@@ -1,5 +1,5 @@
 //
-// Polynomial in Z/MZ
+// Polynomial with integer coefficient (mod M)
 //
 // Implemented routines:
 //   1) addition 
@@ -7,11 +7,13 @@
 //   3) multiplication (naive, Karatsuba, FMT)
 //   4) division (naive, Newton)
 //   5) gcd
+//   6) multipoint evaluation
+//   7) interpolation (naive)
+//   8) polynomial shift (naive)
 //
 // TODO:
-//   6) multipoint evaluation
-//   7) interpolation
-//   8) polynomial shift
+//   7) interpolation (fast) 
+//   8) polynomial shift (fast)
 //
 #include <iostream>
 #include <unordered_set> 
@@ -216,15 +218,22 @@ vector<ll> conv(vector<ll> a, vector<ll> b, ll mod){
   x.resize(n);
   return x;
 }
-poly mul(poly p, poly q, ll M) { return conv(p, q, M); }
+poly mul(poly p, poly q, ll M) { 
+  poly pq = conv(p, q, M);
+  pq.resize(p.size() + q.size() - 1);
+  while (!pq.empty() && !pq.back()) pq.pop_back();
+  return pq;
+}
 
-// Newton division: O(M(n) log n); M is the complexity of multiplication
+// Newton division: O(M(n)); M is the complexity of multiplication
 // fast when FFT multiplication is used
+//
+// Note: complexity = M(n) + M(n/2) + M(n/4) + ... <= 2 M(n).
 pair<poly,poly> divmod(poly p, poly q, ll M) {
-  poly s = p;
+  if (p.size() < q.size()) return { {}, p };
   reverse(all(p)); reverse(all(q));
   poly t = {div(1, q[0], M)}; 
-  if (p.size() < q.size() || t[0] < 0) return { {}, {} };
+  if (t[0] < 0) return { {}, {} }; // infeasible
   for (int k = 1; k <= 2*(p.size()-q.size()+1); k *= 2) {
     poly s = mul(mul(t, q, M), t, M);
     t.resize(k);
@@ -238,25 +247,32 @@ pair<poly,poly> divmod(poly p, poly q, ll M) {
   while (!t.empty() && !t.back()) t.pop_back();
   return {t, sub(p, mul(q, t, M), M) };
 }
-// polynomial GCD: O(D(n) log n); D is the complexity of division
+// polynomial GCD: O(M(n) log n); D is the complexity of division
 poly gcd(poly p, poly q, ll M) {
   for (; !p.empty(); swap(p, q = divmod(q, p, M).snd));
   return p;
 }
 
-/* WIP
+// Polynomial evaluation in multiple points
+// O(M(n) log |x|)
+// In practice, this is fast if |x| >= 10000.
+// (i.e., useless for programming contest)
 vector<ll> evaluate(poly p, vector<ll> x, ll M) {
+  vector<poly> prod(8*x.size()); // segment tree
+  function<poly(int,int,int)> run = [&](int i, int j, int k) {
+    if (i   == j) return prod[k] = (poly){1};
+    if (i+1 == j) return prod[k] = (poly){M-x[i], 1}; 
+    return prod[k] = mul(run(i,(i+j)/2,2*k+1), run((i+j)/2,j,2*k+2), M);
+  }; run(0, x.size(), 0);
   vector<ll> y(x.size());
-
-  function<void(int,int,poly&,poly&)> rec = [&](int i, int j, poly p, poly &q) {
-    if (i+1 == j) {
-      y[i] = (p.empty() ? 0 : p[0]);
-      q = {y[i], 1};
-      return;
+  function<void(int,int,int,poly)> rec = [&](int i, int j, int k, poly p) {
+    if (j - i <= 8) {
+      for (; i < j; ++i) y[i] = eval(p, x[i], M);
+    } else {
+      rec(i, (i+j)/2, 2*k+1, divmod(p, prod[2*k+1], M).snd);
+      rec((i+j)/2, j, 2*k+2, divmod(p, prod[2*k+2], M).snd);
     }
-    rec(i, (i+j)/2, divmod(p, pim).snd);
-    rec((i+j)/2, j, divmod(p, pmj).snd);
-  };
+  }; rec(0, x.size(), 0, p);
   return y;
 }
 
@@ -265,10 +281,9 @@ vector<ll> evaluate(poly p, vector<ll> x, ll M) {
 // p(x) mod (x - x[i].fst) == x[i].snd for i = 0, ..., n-1
 // ==> 
 poly interpolate(vector<pair<ll,ll>> x, ll M) {
+  return poly();
   // 
 }
-*/
-
 
 // find p s.t. p(x[i].fst) = x[i].snd
 // assert: all x[i] must be distinct
@@ -332,7 +347,7 @@ bool TEST_DIVMOD() {
 bool TEST_MUL() {
   for (int seed = 0; seed < 1; ++seed) {
     srand(seed);
-    const ll M = 100000007; 
+    const ll M = 100000007;
     for (int n = 2; n < 1000; ++n) {
       poly p(n), q(n);
       for (int i = 0; i < p.size(); ++i) p[i] = rand() % M;
@@ -342,6 +357,29 @@ bool TEST_MUL() {
       auto pq1 = mul(p, q, M);
       auto pq2 = mul_n(p, q, M);
       TEST(sub(pq1, pq2, M).empty());
+    }
+  }
+  return true;
+}
+bool TEST_EVALUATE() {
+  const ll M = 100000007;
+  for (int seed = 0; seed < 1; ++seed) {
+    srand(seed);
+    for (int n = 2; n < 1000; ++n) {
+      poly p(n);
+      for (int i = 0; i < n; ++i) p[i] = rand() % M;
+      while (p.back() == 0) p.back() = rand() % M;
+      int m = 1 + rand() % (2 * n);
+      vector<ll> x(m);
+      for (int i = 0; i < m; ++i) x[i] = rand() % M;
+      tick();
+      vector<ll> y = evaluate(p, x, M);
+      //cout << n << " " << tick() << " ";
+      vector<ll> z(m);
+      for (int i = 0; i < m; ++i) z[i] = eval(p, x[i], M);
+      //cout << tick() << endl;
+      for (int i = 0; i < x.size(); ++i) 
+        TEST(sub(y[i], eval(p, x[i], M), M) == 0);
     }
   }
   return true;
@@ -364,7 +402,9 @@ bool TEST_INTERPOLATE() {
 }
 
 int main() {
+  TEST(TEST_EVALUATE());
   TEST(TEST_INTERPOLATE());
   TEST(TEST_DIVMOD());
   TEST(TEST_MUL());
+  return 0;
 }
