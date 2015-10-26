@@ -9,12 +9,10 @@
 //   5) gcd
 //   6) multipoint evaluation (divide conquer: O(M(n) log |X|))
 //   7) interpolation (naive O(n^2), divide conquer O(M(n) log n))
-//   8) polynomial shift (naive)
+//   8) polynomial shift (naive, fast)
 //
 //   *) n! mod M in O(n^{1/2} log n) time
 //
-// TODO:
-//   8) polynomial shift (fast)
 //
 #include <iostream>
 #include <unordered_set> 
@@ -77,30 +75,6 @@ ostream& operator<<(ostream &os, const poly &p) {
   }
   return os;
 }
-
-
-// value of p(x)
-ll eval(poly p, ll x, ll M) {
-  ll ans = 0;
-  for (int i = p.size()-1; i >= 0; --i)
-    ans = add(mul(ans, x, M), p[i], M);
-  return ans;
-};
-
-
-// p(x+a) = p[0] + (x+a) p[1] + (x+a)^2 p[2] + ...
-// 
-// q(x) = p(x + a)
-poly shift(poly p, ll a, ll M) {
-  poly q(p.size());
-  for (int i = p.size()-1; i >= 0; --i) {
-    for (int j = p.size()-i-1; j >= 1; --j) 
-      q[j] = add(mul(q[j], a, M), q[j-1], M);
-    q[0] = add(mul(q[0], a, M), p[i], M);
-  }
-  return q;
-}
-
 poly add(poly p, const poly &q, ll M) {
   if (p.size() < q.size()) p.resize(q.size());
   for (int i = 0; i < q.size(); ++i)
@@ -257,9 +231,24 @@ poly gcd(poly p, poly q, ll M) {
   return p;
 }
 
-// Polynomial evaluation in multiple points (Moenck-Borodin algorithm)
-// O(M(n) log |x|)
-// In practice, this is fast if |x| >= 10000.
+// value of p(x)
+ll eval(poly p, ll x, ll M) {
+  ll ans = 0;
+  for (int i = p.size()-1; i >= 0; --i)
+    ans = add(mul(ans, x, M), p[i], M);
+  return ans;
+};
+//
+// faster multipoint evaluation
+// fast if |x| >= 10000.
+//
+// algo:
+//   evaluate(p, {x[0], ..., x[n-1]})
+//   = evaluate(p mod (X-x[0])...(X-x[n/2-1]), {x[0], ..., x[n/2-1]}),
+//   + evaluate(p mod (X-x[n/2])...(X-x[n-1]), {x[n/2], ..., x[n-1]}),
+//
+// f(n) = 2 f(n/2) + M(n) ==> O(M(n) log n)
+//
 vector<ll> evaluate(poly p, vector<ll> x, ll M) {
   vector<poly> prod(8*x.size()); // segment tree
   function<poly(int,int,int)> run = [&](int i, int j, int k) {
@@ -279,24 +268,37 @@ vector<ll> evaluate(poly p, vector<ll> x, ll M) {
   return y;
 }
 
-
+poly interpolate_n(vector<ll> x, vector<ll> y, ll M) {
+  int n = x.size();
+  vector<ll> dp(n+1);
+  dp[0] = 1;
+  for (int i = 0; i < n; ++i) {
+    for (int j = i; j >= 0; --j) {
+      dp[j+1] = add(dp[j+1], dp[j], M);
+      dp[j] = mul(dp[j], M - x[i], M);
+    }
+  }
+  poly r(n);
+  for (int i = 0; i < n; ++i) {
+    ll den = 1, res = 0;
+    for (int j = 0; j < n; ++j) 
+      if (i != j) den = mul(den, sub(x[i], x[j], M), M);
+    den = div(1, den, M);
+    
+    for (int j = n-1; j >= 0; --j) {
+      res = add(dp[j+1], mul(res, x[i], M), M);
+      r[j] = add(r[j], mul(res, mul(den, y[i], M), M), M);
+    }
+  }
+  while (!r.empty() && !r.back()) r.pop_back();
+  return r;
+}
 // 
-// Let (x[i],y[i]) be points.
-// First, let H := (X - x[0]) (X - x[1]) (X - x[2]).
-// Then dH/dX = (X - x[1])(X - x[2]) + (X - x[0])(X - x[2]) + (X - x[0])(X - x[1]).
-// Evaluating dH/dX at {x[0], x[1], x[2]} , we have
-//   dH/dX(x[0]) = (x[0] - x[1])(x[0] - x[2])
-//   dH/dX(x[1]) = (x[1] - x[0])(x[1] - x[2])
-//   dH/dX(x[2]) = (x[2] - x[0])(x[2] - x[1])
-// The solution is 
-//     (X - x[1])(X - x[2]) / (x[0] - x[1])(x[0] - x[2]) y[0] 
-//   + (X - x[0])(X - x[2]) / (x[1] - x[2])(x[1] - x[2]) y[1] 
-//   + (X - x[0])(X - x[1]) / (x[2] - x[1])(x[2] - x[1]) y[2] 
+// faster algo to find a poly p such that
+//   p(x[i]) = y[i]  for each i
 //
-// x[0] ... x[n/2-1] に対応する成分を計算
+// see http://people.mpi-inf.mpg.de/~csaha/lectures/lec6.pdf
 //
-//
-// http://people.mpi-inf.mpg.de/~csaha/lectures/lec6.pdf
 poly interpolate(vector<ll> x, vector<ll> y, ll M) {
   vector<poly> prod(8*x.size()); // segment tree
   function<poly(int,int,int)> run = [&](int i, int j, int k) {
@@ -328,44 +330,46 @@ poly interpolate(vector<ll> x, vector<ll> y, ll M) {
                mul(f((i+j)/2,j,2*k+2), prod[2*k+1], M), M);
   };
   return f(0, x.size(), 0);
+}
 
-  // solution is   \sum_i ui Zi(X)
-  // 
-  // [i,j) についてこれを計算
-  //
-  return H;
+
+//
+// return p(x+a) 
+// 
+poly shift_n(poly p, ll a, ll M) {
+  poly q(p.size());
+  for (int i = p.size()-1; i >= 0; --i) {
+    for (int j = p.size()-i-1; j >= 1; --j) 
+      q[j] = add(mul(q[j], a, M), q[j-1], M);
+    q[0] = add(mul(q[0], a, M), p[i], M);
+  }
+  return q;
 }
 
 //
-// find p s.t. p(x[i]) = y[i] O(n^2)
+// faster algorithm for computing p(x + a) 
 //
-// overpeform when n >= 
+// fast if n >= 4096
+// algo: p(x+a) = p_h(x) (x+a)^m + q_h(x)
+// cplx: preproc: O(M(n))
+//       div-con: O(M(n) log n)
 //
-poly interpolate_n(vector<ll> x, vector<ll> y, ll M) {
-  int n = x.size();
-  vector<ll> dp(n+1);
-  dp[0] = 1;
-  for (int i = 0; i < n; ++i) {
-    for (int j = i; j >= 0; --j) {
-      dp[j+1] = add(dp[j+1], dp[j], M);
-      dp[j] = mul(dp[j], M - x[i], M);
-    }
-  }
-  poly r(n);
-  for (int i = 0; i < n; ++i) {
-    ll den = 1, res = 0;
-    for (int j = 0; j < n; ++j) 
-      if (i != j) den = mul(den, sub(x[i], x[j], M), M);
-    den = div(1, den, M);
-    
-    for (int j = n-1; j >= 0; --j) {
-      res = add(dp[j+1], mul(res, x[i], M), M);
-      r[j] = add(r[j], mul(res, mul(den, y[i], M), M), M);
-    }
-  }
-  while (!r.empty() && !r.back()) r.pop_back();
-  return r;
+poly shift(poly p, ll a, ll M) {
+  vector<poly> pow(p.size()); 
+  pow[0] = {1}; pow[1] = {a,1};
+  int m = 2; 
+  for (; m < p.size(); m *= 2) 
+    pow[m] = mul(pow[m/2], pow[m/2], M);
+  function<poly(poly,int)> rec = [&](poly p, int m) {
+    if (p.size() <= 1) return p;
+    while (m >= p.size()) m /= 2;
+    poly q(p.begin() + m, p.end());
+    p.resize(m);
+    return add(mul(rec(q, m), pow[m], M), rec(p, m), M);
+  };
+  return rec(p, m);
 }
+
 
 //
 // overpeform when n >= 134217728 lol
@@ -374,7 +378,7 @@ ll factmod(ll n, ll M) {
   if (n <= 1) return 1;
   ll m = sqrt(n); 
   function<poly(int,int)> get = [&](int i, int j) {
-    if (i   == j) return (poly){};
+    if (i   == j) return poly();
     if (i+1 == j) return (poly){i,1};
     return mul(get(i, (i+j)/2), get((i+j)/2, j), M);
   };
@@ -498,10 +502,39 @@ bool TEST_INTERPOLATE() {
   }
   return true;
 }
+bool TEST_SHIFT() {
+  for (int seed = 0; seed < 1; ++seed) {
+    srand(seed);
+    const ll M = 1000000007; 
+    for (int n = 2; n < 100000; n *= 2) {
+      poly p(n);
+      for (int i = 0; i < n; ++i) p[i] = rand() % M;
+      while (p.back() == 0) p.back() = rand() % M;
+      ll a = rand() % M;
+      cout << n << " ";
+      tick();
+      poly q = shift(p, a, M);
+      cout << tick() << " ";
+      poly r = shift_n(p, a, M);
+      cout << tick() << endl;
+      TEST(sub(q, r, M).empty());
+      ll b = rand() % M;
+      TEST(sub(eval(p, add(a,b,M), M), eval(q, b, M), M) == 0);
+    }
+  }
+}
 
 int main() {
-  /*
-  ll M = 1000000007;
+
+  TEST_SHIFT();
+
+  const ll M = 1000000007;
+
+  poly p = {0, 0, 0, 0, 0, 1};
+  poly q = shift(p, 1, M);
+  cout << q << endl;
+
+  return 0;
   for (int i = 1; i < M; i *= 2) {
     cout << i << " ";
     cout << factmod_p(i, M) << " ";
@@ -509,7 +542,7 @@ int main() {
     cout << factmod_n(i, M) << " ";
     cout << tick() << endl;
   }
-  return 0;*/
+  return 0;
   TEST(TEST_INTERPOLATE());
   TEST(TEST_EVALUATE());
   TEST(TEST_DIVMOD());
