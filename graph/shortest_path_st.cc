@@ -6,8 +6,9 @@
 //   these two vertices.
 //
 // Algorithm:
-//   Bidirectional dijkstra algorithm.
-//   Much faster than standard dijkstra in practice.
+//   Bidirectional dijkstra algorithm that performs Dijkstra 
+//   algorithm from s and t simultaneously.
+//   Usually, it is much faster than standard Dijkstra.
 //
 // Verified:
 //   SPOJ SHPATH
@@ -39,12 +40,10 @@ struct graph {
   int shortest_path(int s, int t) {
     if (s == t) return 0;
     vector<int> ds(n, INF), dt(n, INF);
-    ds[s] = dt[t] = 0;
-
     typedef pair<int, int> node;
     priority_queue<node, vector<node>, greater<node>> Qs, Qt;
-    Qs.push({0, s});
-    Qt.push({0, t});
+    Qs.push({ds[s] = 0, s});
+    Qt.push({dt[t] = 0, t});
     int mu = INF;
     while (!Qs.empty() && !Qt.empty()) {
       if (Qs.top().fst + Qt.top().fst >= mu) break;
@@ -54,8 +53,7 @@ struct graph {
         for (edge &e: adj[x.snd]) {
           if (ds[e.src] + e.weight < ds[e.dst]) {
             mu = min(mu, ds[e.src] + e.weight + dt[e.dst]);
-            ds[e.dst] = ds[e.src] + e.weight;
-            Qs.push({ds[e.dst], e.dst});
+            Qs.push({ds[e.dst] = ds[e.src] + e.weight, e.dst});
           }
         }
       } else {
@@ -64,8 +62,7 @@ struct graph {
         for (edge &e: rdj[x.snd]) {
           if (dt[e.src] + e.weight < dt[e.dst]) {
             mu = min(mu, dt[e.src] + e.weight + ds[e.dst]);
-            dt[e.dst] = dt[e.src] + e.weight;
-            Qt.push({dt[e.dst], e.dst});
+            Qt.push({dt[e.dst] = dt[e.src] + e.weight, e.dst});
           }
         }
       }
@@ -102,7 +99,6 @@ void solve() {
 }
 
 int main() {
-  return test2();
   int ncase; scanf("%d", &ncase);
   for (int icase = 0; icase < ncase; ++icase) solve();
 }
