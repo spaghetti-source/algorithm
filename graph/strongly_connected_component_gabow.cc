@@ -2,10 +2,10 @@
 // Gabow's strongly connected component
 //
 // Description:
-//   Compute the strongly connected components(SCCs) decomposition.
-//   A set of vertices S is a strongly connected component (SCC) if
-//   for all u and v in S, there is a path from u to v.
-//   Any digraph can be uniquely decomposed into SCCs.
+//   For a graph G = (V, E), u and v are strongly connected if
+//   there are paths u -> v and v -> u. This defines an equivalent
+//   relation, and its equivalent class is called a strongly 
+//   connected component.
 //
 //
 // Algorithm:
