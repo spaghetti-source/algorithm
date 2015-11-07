@@ -3,9 +3,9 @@
 //
 // Description:
 //   Compute the strongly connected components(SCCs) decomposition.
-//   A set of vertices S of a digraph is a SCC iff 
-//   for each u, v in S, there is a path from u to v.
-//   Any digraph can be uniquely split into SCCs.
+//   A set of vertices S is a strongly connected component (SCC) if
+//   for all u and v in S, there is a path from u to v.
+//   Any digraph can be uniquely decomposed into SCCs.
 //
 //
 // Algorithm:
