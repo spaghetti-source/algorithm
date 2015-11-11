@@ -2,8 +2,9 @@
 // Offline least common ancestor
 //
 // Description
-//   For a tree G = (V,E), it computes least common ancestors of
-//    (u_j, v_j) for v = 1, ..., q. Here, all queries are given in advance.
+//   For a rooted tree T, LCA(u,v) is a vertex u
+//   that is the deepest node that is a common ancestor of u and v.
+//   It computes all lcas of (u_j, v_j) for v = 1, ..., q. 
 //
 // Algorithm
 //   Tarjan's dfs and union-find.
