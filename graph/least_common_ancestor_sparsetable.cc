@@ -11,6 +11,10 @@
 //   RMQ is the range minimum query between i and j,
 //   where the weight is defined by the depth of the node.
 //
+// Complexity:
+//   O(n log n) for preprocessing,
+//   O(1) for query
+//
 // Verified:
 //   AOJ GRL_5C
 //
