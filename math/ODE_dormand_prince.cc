@@ -46,7 +46,8 @@ double dormand_prince(F f, double t, double tend, double x) {
   double e[] = {71./57600, 0, -71./16695, 71./1920, -17253./339200, 22./525, -1./40};
   
   const double EPS = 1e-5;
-  for (double h = EPS; t < tend; ) {
+  double h = EPS;
+  while (t < tend) {
     if (t + h >= tend) h = tend - t;
     double k[7];
     for (int i = 0; i < 7; ++i) {
@@ -57,20 +58,19 @@ double dormand_prince(F f, double t, double tend, double x) {
     }
     double err = 0;
     for (int i = 0; i < 7; ++i) x   += b[i] * k[i];
-    t += h; // (t, x(t)) 
+    t += h; // (t, x)
 
     for (int i = 0; i < 7; ++i) err += e[i] * k[i];
     double s = pow(EPS * h / (2 * abs(err)), 1./5);
     s = min(max(s, 1./4), 4.);
     h = s * h;
   }
-  return x; // return t(1)
+  return x;
 }
 
-
-// comparison: The 4th order Runge Kutta method
+// for comparison
 template <class F>
-void runge_kutta(F f, double t, double tend, double x) {
+double runge_kutta(F f, double t, double tend, double x) {
   const double EPS = 1e-5;
   for (double h = EPS; t < tend; ) {
     if (t + h >= tend) h = tend - t;
@@ -79,36 +79,29 @@ void runge_kutta(F f, double t, double tend, double x) {
     double k3 = h * f(t + h/2, x + k2/2);
     double k4 = h * f(t + h  , x + k3  );
     x += (k1 + 2 * k2 + 2 * k3 + k4) / 6;
-    t += h;
-    printf("x(%f) = %f\n", t, x);
+    t += h; // (t, x)
   }
+  return x;
 }
 
-// comparison: The Euler method
+// for comparison
 template <class F>
-void euler(F f, double t, double tend, double x) {
+double euler(F f, double t, double tend, double x) {
   const double EPS = 1e-5;
   for (double h = EPS; t < tend; ) {
     if (t + h >= tend) h = tend - t;
     x += h * f(t, x);
     t += h;
-    printf("x(%f) = %f\n", t, x);
   }
+  return x;
 }
-
-// dx/dt = xt
-// ==> x = x0 exp(t^2/2)
 
 int main() {
   auto f = [](double t, double x) {
     return t * x;
   };
-  dormand_prince(f, 0, 1, 1);
-  printf("---\n");
-  runge_kutta(f, 0, 1, 1);
-  printf("---\n");
-  euler(f, 0, 1, 1);
-  printf("---\n");
-  printf("x(%f) = %f\n", 1., exp(1.0/2.0));
+  printf("%f\n", dormand_prince(f, 0, 1, 1));
+  printf("%f\n", runge_kutta(f, 0, 1, 1));
+  printf("%f\n", euler(f, 0, 1, 1));
+  printf("%f\n", exp(1.0/2.0));
 }
-
