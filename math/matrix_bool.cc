@@ -1,5 +1,5 @@
 // 
-// Boolean coefficient matrix
+// Boolean matrix
 //
 // Description:
 //   This admits very fast operations for boolean matrices.
@@ -11,8 +11,7 @@
 //   W x W block is performed by bit operations;
 //
 // Complexity: (in practice)
-//   O(n^3); however, for practical n, it is basically
-//   20--100 times faster than the naive implementation.
+//   50--60 times faster than the naive implementation.
 //
 
 #include <iostream>
@@ -20,21 +19,18 @@
 #include <cstdio>
 #include <algorithm>
 #include <functional>
+#include <ctime>
 
 using namespace std;
 
-#define fst first
-#define snd second
-#define all(c) ((c).begin()), ((c).end())
-
+// proposed
 namespace bitmatrix {
-
 typedef unsigned long long ull;
 struct mat {
   int n, m;
   vector<vector<ull>> x;
-  mat(int n, int m) : n(n), m(m), x(1+n/8, vector<ull>(1+m/8)) { }
-  bool get(int i, int j) { 
+  mat(int m, int n) : m(m), n(n), x(1+m/8, vector<ull>(1+n/8)) { }
+  bool get(int i, int j) const { 
     return x[i/8][j/8] & (1ull << (8*(i%8)+(j%8)));
   }
   void set(int i, int j, int b) {
@@ -42,14 +38,13 @@ struct mat {
     else   x[i/8][j/8] &= ~(1ull << (8*(i%8)+(j%8)));
   } 
 };
-void disp(ull a) {
-  for (int i = 0; i < 8; ++i) {
-    for (int j = 0; j < 8; ++j) {
-      printf("%d", !!(a & 1));
-      a >>= 1;
-    }
-    printf("\n");
+ostream &operator<<(ostream &os, const mat &A) {
+  for (int i = 0; i < A.m; ++i) {
+    for (int j = 0; j < A.n; ++j) 
+      os << A.get(i, j);
+    os << endl;
   }
+  return os;
 }
 mat eye(int n) {
   mat I(n, n);
@@ -63,8 +58,6 @@ mat add(mat A, const mat &B) {
       A.x[i][j] |= B.x[i][j];
   return A;
 }
-// 8 x 8 matrix product in 128 bit operations. 
-// (cf: naive method requires 1024 ops)
 ull mul(ull a, ull b) { // C[i][j] |= A[i][k] & B[k][j]
   const ull u = 0x101010101010101, v = 0xff;
   ull x, y, c = 0;
@@ -102,6 +95,23 @@ mat pow(mat A, int k) {
   }
   return X;
 }
+
+ull transpose(ull a) {
+  ull t = (a ^ (a >> 7)) & 0x00aa00aa00aa00aa;
+  a = a ^ t ^ (t << 7);
+  t = (a ^ (a >> 14)) & 0x0000cccc0000cccc;
+  a = a ^ t ^ (t << 14);
+  t = (a ^ (a >> 28)) & 0x00000000f0f0f0f0;
+  a = a ^ t ^ (t << 28);
+  return a;
+}
+mat transpose(mat A) {
+  mat B(A.m, A.n);
+  for (int i = 0; i < A.x.size(); ++i) 
+    for (int j = 0; j < A.x[0].size(); ++j) 
+      B.x[j][i] = transpose(A.x[i][j]);
+  return B;
+}
 }
 
 namespace vector_bool {
@@ -129,59 +139,58 @@ mat mul(mat A, const mat &B) {
   }
   return A;
 }
+mat pow(mat A, int k) {
+  mat X = eye(A.size());
+  for (; k > 0; k >>= 1) {
+    if (k & 1) X = mul(X, A);
+    A = mul(A, A);
+  }
+  return X;
+}
 }
 
-
-// === tick a time ===
-#include <ctime>
-double tick() {
-  static clock_t oldtick;
-  clock_t newtick = clock();
-  double diff = 1.0*(newtick - oldtick) / CLOCKS_PER_SEC;
-  oldtick = newtick;
-  return diff;
-}
-
+/*
 int main() {
-  int n = 2000;
-  {
-    using namespace bitmatrix;
-    tick();
-    mat A(n, n);
-    for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n; ++j) {
-        A.set(i, j, rand() % 2);
+  for (int n = 1; n < 512; n *= 2) {
+    printf("%d\t", n);
+    {
+      using namespace bitmatrix;
+      mat A(n, n);
+      for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+          A.set(i, j, rand() % 2);
+        }
       }
+      double _time = clock();
+      A = pow(add(A, eye(n)), n); // (A + I)^n is a transitive closure
+      _time = clock() - _time;
+      printf("%f\t", _time / CLOCKS_PER_SEC);
     }
-    A = pow(add(A, eye(n)), n); // (A + I)^n is a transitive closure
-    printf("%f\n", tick());
-  }
-
-  {
-    using namespace vector_bool;
-    tick();
-    mat A(n, vec(n));
-    for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n; ++j) {
-        A[i][j] = rand() % 2;
+    {
+      using namespace vector_bool;
+      mat A(n, vec(n));
+      for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+          A[i][j] = rand() % 2;
+        }
+        A[i][i] = 1;
       }
-      A[i][i] = 1;
+      double _time = clock();
+      A = pow(add(A, eye(n)), n); // (A + I)^n is a transitive closure
+      _time = clock() - _time;
+      printf("%f\n", _time / CLOCKS_PER_SEC);
     }
-    for (int k = 0; k < n; ++k)
-      for (int i = 0; i < n; ++i)
-        for (int j = 0; j < n; ++j)
-          A[i][j] = (A[i][j] | (A[i][k] & A[k][j])) ;
-    printf("%f\n", tick());
   }
+}
+*/
+int main() {
+  using namespace bitmatrix;
+  int n = 12;
+  mat A(n,n);
+  for (int i = 0; i < n; ++i) 
+    for (int j = 0; j < n; ++j)
+      A.set(i, j, rand() % 2);
 
-
-  /*
-  {
-    tick();
-    ull a = 0x123402010444107ull, b = 0x140455113142107ull;
-    for (int iter = 0; iter < 10000000; ++iter) 
-      a = mul_n(a, b);
-    cout << tick() << endl;
-  }
-  */
+  cout << A << endl;
+  cout << transpose(A) << endl;
 }
