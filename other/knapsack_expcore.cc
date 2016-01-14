@@ -75,7 +75,7 @@ struct knapsack {
       }
     }
   }
-  int solve() {
+  T solve() {
     sort(all(is), [](const item &a, const item &b) { 
       return a.p * b.w > a.w * b.p;
     });
