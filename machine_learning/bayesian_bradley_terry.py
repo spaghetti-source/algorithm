@@ -43,13 +43,13 @@ def update(result):
         mu[i]     += Omega
         sigma[i]  *= max(1.0 - Delta, kappa)
 
-# test
+# verification
 out = []
 for iter in range(10000):
     if random.random() < 0.25:
         update({'a': 1, 'b': 2})
     else:
         update({'a': 2, 'b': 1})
-    out.append(logit(mu['a']/c('a','b'), mu['b']/c('a','b')))
+    out.append(p('a', 'b'))
 plt.plot(out)
 plt.show()
