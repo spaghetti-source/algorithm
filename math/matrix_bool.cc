@@ -23,7 +23,6 @@
 
 using namespace std;
 
-// proposed
 namespace bitmatrix {
 typedef unsigned long long ull;
 struct mat {
@@ -58,25 +57,22 @@ mat add(mat A, const mat &B) {
       A.x[i][j] |= B.x[i][j];
   return A;
 }
+
+void disp(ull a) {
+  for (int i = 0; i < 8; ++i) {
+    for (int j = 0; j < 8; ++j) {
+      printf("%d", !!(a & 1));
+      a >>= 1;
+    }
+    printf("\n");
+  }
+}
+
 ull mul(ull a, ull b) { // C[i][j] |= A[i][k] & B[k][j]
-  const ull u = 0x101010101010101, v = 0xff;
-  ull x, y, c = 0;
-  x = a&(u<< 0); x |= (x<<1); x |= (x<< 2); x |= (x << 4); 
-  y = b&(v<< 0); y |= (y<<8); y |= (y<<16); y |= (y <<32); c |= (x&y);
-  x = a&(u<< 1); x |= (x>>1); x |= (x<< 2); x |= (x << 4);
-  y = b&(v<<18); y |= (y>>8); y |= (y<<16); y |= (y <<32); c |= (x&y);
-  x = a&(u<< 2); x |= (x<<1); x |= (x>> 2); x |= (x << 4);
-  y = b&(v<<16); y |= (y<<8); y |= (y>>16); y |= (y <<32); c |= (x&y);
-  x = a&(u<< 3); x |= (x>>1); x |= (x>> 2); x |= (x << 4);
-  y = b&(v<<24); y |= (y>>8); y |= (y>>16); y |= (y <<32); c |= (x&y);
-  x = a&(u<< 4); x |= (x<<1); x |= (x<< 2); x |= (x >> 4);
-  y = b&(v<<32); y |= (y<<8); y |= (y<<16); y |= (y >>32); c |= (x&y);
-  x = a&(u<< 5); x |= (x>>1); x |= (x<< 2); x |= (x >> 4);
-  y = b&(v<<40); y |= (y>>8); y |= (y<<16); y |= (y >>32); c |= (x&y);
-  x = a&(u<< 6); x |= (x<<1); x |= (x>> 2); x |= (x >> 4);
-  y = b&(v<<48); y |= (y<<8); y |= (y>>16); y |= (y >>32); c |= (x&y);
-  x = a&(u<< 7); x |= (x>>1); x |= (x>> 2); x |= (x >> 4);
-  y = b&(v<<56); y |= (y>>8); y |= (y>>16); y |= (y >>32); c |= (x&y);
+  const ull u = 0xff, v = 0x101010101010101;
+  ull c = 0;
+  for (;a && b; a >>= 1, b >>= 8)
+    c |= (((a & v) * u) & ((b & u) * v));
   return c;
 }
 mat mul(mat A, mat B) {
@@ -108,7 +104,7 @@ ull transpose(ull a) {
 mat transpose(mat A) {
   mat B(A.m, A.n);
   for (int i = 0; i < A.x.size(); ++i) 
-    for (int j = 0; j < A.x[0].size(); ++j) 
+    for (int j = 0; j <= A.x[0].size(); ++j) 
       B.x[j][i] = transpose(A.x[i][j]);
   return B;
 }
@@ -149,9 +145,8 @@ mat pow(mat A, int k) {
 }
 }
 
-/*
 int main() {
-  for (int n = 1; n < 512; n *= 2) {
+  for (int n = 1; n < 10000; n *= 2) {
     printf("%d\t", n);
     {
       using namespace bitmatrix;
@@ -166,6 +161,8 @@ int main() {
       _time = clock() - _time;
       printf("%f\t", _time / CLOCKS_PER_SEC);
     }
+    printf("\n");
+    continue;
     {
       using namespace vector_bool;
       mat A(n, vec(n));
@@ -181,16 +178,4 @@ int main() {
       printf("%f\n", _time / CLOCKS_PER_SEC);
     }
   }
-}
-*/
-int main() {
-  using namespace bitmatrix;
-  int n = 12;
-  mat A(n,n);
-  for (int i = 0; i < n; ++i) 
-    for (int j = 0; j < n; ++j)
-      A.set(i, j, rand() % 2);
-
-  cout << A << endl;
-  cout << transpose(A) << endl;
 }
