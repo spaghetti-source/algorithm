@@ -36,7 +36,7 @@ int coin_change(int coins[], int cn, int money){
       if (i >= coins[j]){
         mini = min(mini, table[i-coins[j]]+1);
         pred[i] = j;
-      } 
+      }
     }
     table[i] = mini;
   }
