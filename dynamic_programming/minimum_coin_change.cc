@@ -6,6 +6,10 @@
 // Algorithm:
 //  Construct a table[][] and solve in a top bottom manner.
 //  The witness pred[] array records the coins that are selected.
+// define d[i] as the minimum number of coins to change i amout of money, cj as the coin value of jth coin
+// then
+//   d[i] = 0, when i=0
+//   d[i] = min(d[i], d[i-cj]+1) for cj<=i, when i>=1
 
 // Complexity:
 // For m number of coins and n amount of money:
