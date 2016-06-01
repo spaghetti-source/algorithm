@@ -2,7 +2,7 @@
 // Zero-One IP Solver
 //
 // Description:
-//   Balas's additive IP sovler branch-and-bound IP solver.
+//   Balas's branch-and-bound 0-1 IP sovler.
 //   It seeks an integer solution to min c'x s.t. Ax <= b, x in {0,1}^n.
 //   The algorithm enumerates x with some branch-and-bound techniques
 //   without solving the corresponding LP. 
