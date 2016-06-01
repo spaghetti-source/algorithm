@@ -19,7 +19,7 @@ using namespace std;
 #define snd second
 #define all(c) ((c).begin()), ((c).end())
 #define TEST(s) if (!(s)) { cout << __LINE__ << " " << #s << endl; exit(-1); }
-
+ 
 template <class It>
 bool next_radix(It begin, It end, int base) {
   for (It cur = begin; cur != end; ++cur) {
