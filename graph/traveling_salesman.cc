@@ -2,9 +2,9 @@
 // Traveling Salesman Problem (Branch-and-Bound)
 //
 // Description:
-//   It finds TSP by branch-and-bound algorithm that computes
-//   a lower bound from the reduced cost matrix.
-//   This procedure is similar to the Kuhn-Munkres algorithm.
+//   It solves TSP exactly by branch-and-bound algorithm that
+//   employs a lower bound from the reduced cost matrix,
+//   which is similar to the Kuhn-Munkres reduction.
 //
 //   In practice, it scales to networks with |V| <= 40.
 //
