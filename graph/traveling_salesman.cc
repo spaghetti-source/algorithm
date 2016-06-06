@@ -1,5 +1,5 @@
 // 
-// Traveling Salesman Problem (Branch-and-Bound)
+// Traveling Salesman Problem (Little et al's Branch-and-Bound)
 //
 // Description:
 //   It solves TSP exactly by branch-and-bound algorithm that
@@ -8,7 +8,7 @@
 //
 //   In practice, it scales to networks with |V| <= 40.
 //
-//   
+//    
 // References:
 //   J. D. C. Little, K. G. Murty, D. W. Sweeney, and C. Karel (1963):
 //   An algorithm for traveling salesman problem. 
