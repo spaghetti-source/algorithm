@@ -14,5 +14,5 @@ author: Takanori MAEHARA (e-mail: maehara@prefield.com / twitter: @tmaehara)
 
 ## Graph
 
-- [Maximum Flow (Ford-Fulkerson)](maximum_flow_ford_fulkerson.cc)
+- [Maximum Flow (Ford-Fulkerson)](graph/maximum_flow_ford_fulkerson.cc)
 - [Maximum Flow (Dinic)](graph/maximum_flow_dinic.cc)
