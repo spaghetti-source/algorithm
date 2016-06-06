@@ -15,7 +15,7 @@
 //   AOJ GRL_6_A: Maximum Flow
 //
 // Reference:
-//   B. H. Korte and Jens Vygen (2008):
+//   B. H. Korte and J. Vygen (2008):
 //   Combinatorial Optimization: Theory and Algorithms.
 //   Springer Berlin Heidelberg. 
 //
