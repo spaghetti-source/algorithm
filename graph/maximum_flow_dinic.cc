@@ -10,6 +10,8 @@
 //
 // Complexity:
 //   O(n^2 m), but very fast in practice.
+//   In particular, for a unit capacity graph, 
+//   it runs in O(m min{m^{1/2}, n^{2/3}}).
 // 
 // Verified:
 //   SPOJ FASTFLOW
@@ -19,7 +21,7 @@
 //   Algorithm for solution of a problem of maximum flow in networks with power estimation.
 //   Soviet Mathematics Doklady, vol. 11, pp. 1277-1280.
 //
-//   B. H. Korte and Jens Vygen (2008):
+//   B. H. Korte and J. Vygen (2008):
 //   Combinatorial Optimization: Theory and Algorithms.
 //   Springer Berlin Heidelberg. 
 //
@@ -49,7 +51,7 @@ struct graph {
   graph(int n) : n(n), adj(n) { }
   void add_edge(int src, int dst, long long capacity) {
     adj[src].push_back({src, dst, capacity, 0, adj[dst].size()});
-    adj[dst].push_back({dst, src, capacity, 0, adj[src].size()-1});
+    adj[dst].push_back({dst, src, capacity, 0, adj[src].size()-1}); // bidirectional edge
   }
   long long max_flow(int s, int t) {
     vector<int> level(n), iter(n);
