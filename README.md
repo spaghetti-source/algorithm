@@ -9,10 +9,3 @@ You can use them for any purpose without any warranty.
 
 
 author: Takanori MAEHARA (e-mail: maehara@prefield.com / twitter: @tmaehara)
-
-# List
-
-## Graph
-
-- [Maximum Flow (Ford-Fulkerson)](graph/maximum_flow_ford_fulkerson.cc)
-- [Maximum Flow (Dinic)](graph/maximum_flow_dinic.cc)
