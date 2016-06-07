@@ -9,3 +9,8 @@ You can use them for any purpose without any warranty.
 
 
 author: Takanori MAEHARA (e-mail: maehara@prefield.com / twitter: @tmaehara)
+
+
+# Test
+
+test
