@@ -153,6 +153,7 @@ This category should be reorganized.
 
 - [Coordinate Compression](other/coordinate_compression.cc)
 - [Gregorian Calendar](other/gregorian_calendar.cc)
+- [Poker Hands](other/poker_hands.cc)
 - [Cube](other/cube.cc)
 - other/all_nearest_smaller_values.cc
 - other/exact_cover.cc
