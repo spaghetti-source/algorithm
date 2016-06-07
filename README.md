@@ -22,10 +22,10 @@ author: Takanori MAEHARA (e-mail: maehara@prefield.com / twitter: @tmaehara)
 
 ## Data structure
 
-- [Zero suppressed decision diagram](data_structure/ZDD.cc)
-- [Cartesian tree](data_structure/cartesian_tree.cc)
-- [Fenwick tree](data_structure/fenwick_tree.cc)
-- [2D Fenwick tree](data_structure/fenwick_tree_2d.cc)
+- [Zero Suppressed Decision Diagram (ZDD)](data_structure/ZDD.cc)
+- [Cartesian Tree](data_structure/cartesian_tree.cc)
+- [Fenwick Tree](data_structure/fenwick_tree.cc)
+- [2D Fenwick Tree](data_structure/fenwick_tree_2d.cc)
 - [Sparse Table](data_structure/sparse_table.cc)
 - [Randomized Binary Search Tree](data_structure/randomized_binary_search_tree.cc)
 - [Splay Tree](data_structure/splay_tree.cc)
