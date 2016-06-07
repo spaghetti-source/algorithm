@@ -8,11 +8,11 @@
 //
 //
 // Complexity
-//   O(n^log 3), faster than naive method for n >= 1000
+//   O(n^log 3), always faster than naive method 
 //
 // Verified
 //   SPOJ 31: Fast Multiplication
-//   (Remark: TLE for VFMUL)
+//   SPOJ 235: Very Fast Multiplication
 
 #include <iostream>
 #include <cstdio>
@@ -26,9 +26,6 @@ using namespace std;
 
 #define REP(i,n) for(int i=0;i<n;++i)
 
-// Karatsuba multiplication
-//
-// faster on n >= 1000
 typedef long long LL;
 void mul(LL a[], int an, LL b[], int bn, LL c[], int &cn) {
   if (an < bn) { swap(an, bn); swap(a, b); }
