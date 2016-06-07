@@ -27,27 +27,19 @@ author: Takanori MAEHARA (e-mail: maehara@prefield.com / twitter: @tmaehara)
 - [Fenwick tree](data_structure/fenwick_tree.cc)
 - [2D Fenwick tree](data_structure/fenwick_tree_2d.cc)
 - [Sparse Table](data_structure/sparse_table.cc)
-
 - [Randomized Binary Search Tree](data_structure/randomized_binary_search_tree.cc)
 - [Splay Tree](data_structure/splay_tree.cc)
-
 - [Min-Max Heap](data_structure/minmax_heap.cc)
 - [Radix Heap](data_structure/radix_heap.cc)
 - [Skew Heap](data_structure/skew_heap.cc)
-
 - [Sqrt Array](data_structure/sqrt_array.cc)
-
 - [Union Find](data_structure/union_find.cc)
 - [Traversable Union Find](data_structure/union_find2.cc)
-
 - [Wavelet Matrix](data_structure/wavelet_matrix.cc)
-
 - [Persistent array](data_structure/persistent_array.cc)
 - [Persistent heap](data_structure/persistent_heap.cc)
 - [Persistent rope](data_structure/persistent_rope.cc)
 - [Persistent union find](data_structure/persistent_union_find.cc)
-
-- [Cube](data_structure/cube.cc)
 
 
 ## Dynamic programming
@@ -161,6 +153,7 @@ This category should be reorganized.
 
 - [Coordinate Compression](other/coordinate_compression.cc)
 - [Gregorian Calendar](other/gregorian_calendar.cc)
+- [Cube](other/cube.cc)
 - other/all_nearest_smaller_values.cc
 - other/exact_cover.cc
 - other/knapsack_expcore.cc
