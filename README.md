@@ -159,8 +159,9 @@ This category should be reorganized.
 
 This category should be reorganized.
 
+- [Coordinate Compression](other/coordinate_compression.cc)
+- [Gregorian Calendar](other/gregorian_calendar.cc)
 - other/all_nearest_smaller_values.cc
-- other/calendar.cc
 - other/exact_cover.cc
 - other/knapsack_expcore.cc
 - other/sorting_network.cc
