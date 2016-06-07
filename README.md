@@ -20,6 +20,9 @@ author: Takanori MAEHARA (e-mail: maehara@prefield.com / twitter: @tmaehara)
 - [Permutation index](combinatorics/permutation_index.cc)
 - [Permutation index (general)](combinatorics/permutation_index_general.cc)
 
+
+## Data structure
+
 data_structure/ZDD.cc
 data_structure/cartesian_tree.cc
 data_structure/cube.cc
@@ -39,10 +42,20 @@ data_structure/sqrt_array.cc
 data_structure/union_find.cc
 data_structure/union_find2.cc
 data_structure/wavelet_matrix.cc
+
+
+## Dynamic programming
+
+This category should be reorganized.
+
 dynamic_programming/knapsack.cc
 dynamic_programming/longest_increasing_subsequence.cc
 dynamic_programming/minimum_coin_change.cc
 dynamic_programming/rod_cutting.cc
+
+
+## Computational Geometry (2D)
+
 geometry/!circle.cc
 geometry/bk_tree.cc
 geometry/convex_hull.cc
@@ -51,6 +64,10 @@ geometry/randomized_kd_tree.cc
 geometry/rectangle_union.cc
 geometry/rectilinear_mst.cc
 geometry/vantage_point_tree.cc
+
+
+## Graph Algorithms
+
 graph/arborescence.cc
 graph/arborescence2.cc
 graph/articulation_points.cc
@@ -95,7 +112,12 @@ graph/transitive_reduction_dag.cc
 graph/traveling_salesman.cc
 graph/tree_decomposition.cc
 graph/tree_isomorphism.cc
-machine_learning/bradley_terry.cc
+
+
+## Mathematics
+
+This category should be reorganized.
+
 math/KaratsubaMultiplication.cc
 math/ODE_dormand_prince.cc
 math/ODE_runge_kutta.cc
@@ -116,12 +138,21 @@ math/satisfiability.cc
 math/satisfiability_hornsat.cc
 math/satisfiability_twosat.cc
 math/zero_one_IP_solver.cc
+
+
+## Number theory
+
 number_theory/carmichael_lambda.cc
 number_theory/divisor_sigma.cc
 number_theory/euler_phi.cc
 number_theory/mobius_mu.cc
 number_theory/modular_arithmetics.cc
 number_theory/primes.cc
+
+## Other
+
+This category should be reorganized.
+
 other/all_nearest_smaller_values.cc
 other/calendar.cc
 other/exact_cover.cc
@@ -130,19 +161,9 @@ other/sorting_network.cc
 other/subset_sum.cc
 other/unweighted_interval_scheduling.cc
 other/weighted_interval_scheduling.cc
-string/NFAtoDFA.cc
-string/boyer_moore.cc
-string/earley.cc
-string/edit_distance_NFA.cc
-string/factor_automaton.cc
-string/infix_to_postfix.cc
-string/knuth_morris_pratt.cc
-string/palindromic_tree.cc
-string/suffix_array.cc
-string/suffix_tree.cc
-string/sunday.cc
+
 
 ## Misc
-[Dictionary](_misc/dictionary.cc)
-[Tick](_misc/tick.cc)
+- [Dictionary](_misc/dictionary.cc)
+- [Tick](_misc/tick.cc)
 
