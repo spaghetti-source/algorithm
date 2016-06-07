@@ -15,10 +15,10 @@ author: Takanori MAEHARA (e-mail: maehara@prefield.com / twitter: @tmaehara)
 
 ## Combinatorics 
 
-[Next radix number](combinatorics/next_radix.cc)
-[Unique hash for permutations](combinatorics/permutation_hash.cc)
-[Permutation index](combinatorics/permutation_index.cc)
-[Permutation index (general)](combinatorics/permutation_index_general.cc)
+- [Next radix number](combinatorics/next_radix.cc)
+- [Unique hash for permutations](combinatorics/permutation_hash.cc)
+- [Permutation index](combinatorics/permutation_index.cc)
+- [Permutation index (general)](combinatorics/permutation_index_general.cc)
 
 data_structure/ZDD.cc
 data_structure/cartesian_tree.cc
