@@ -2,7 +2,7 @@
 // Calendar
 //
 // Description:
-//   A code for converting gregorian date <=> julian day number
+//   A code for converting gregorian date <=> julian day number.
 //
 
 #include <iostream>
