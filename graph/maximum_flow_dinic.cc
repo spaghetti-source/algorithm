@@ -41,28 +41,29 @@ using namespace std;
 
 const long long INF = (1ll << 50);
 struct graph {
-  int n;
+  typedef long long flow_type;
   struct edge {
     int src, dst;
-    long long capacity, residue;
+    flow_type capacity, flow;
     size_t rev;
   };
+  int n;
   vector<vector<edge>> adj;
   graph(int n) : n(n), adj(n) { }
-  void add_edge(int src, int dst, long long capacity) {
+  void add_edge(int src, int dst, flow_type capacity) {
     adj[src].push_back({src, dst, capacity, 0, adj[dst].size()});
-    adj[dst].push_back({dst, src, capacity, 0, adj[src].size()-1}); // bidirectional edge
+    adj[dst].push_back({dst, src, 0, 0, adj[src].size()-1});
   }
-  long long max_flow(int s, int t) {
+  flow_type max_flow(int s, int t) {
     vector<int> level(n), iter(n);
-    function<int(void)> levelize = [&]() {
+    function<int(void)> levelize = [&]() { // foward levelize
       level.assign(n, -1); level[s] = 0;
       queue<int> Q; Q.push(s);
       while (!Q.empty()) {
         int u = Q.front(); Q.pop();
         if (u == t) break;
         for (auto &e: adj[u]) {
-          if (e.residue > 0 && level[e.dst] < 0) {
+          if (e.capacity > e.flow && level[e.dst] < 0) {
             Q.push(e.dst);
             level[e.dst] = level[u] + 1;
           }
@@ -70,30 +71,31 @@ struct graph {
       }
       return level[t];
     };
-    function<long long(int, long long)> augment = [&](int u, long long cur) {
+    function<flow_type(int, flow_type)> augment = [&](int u, flow_type cur) {
       if (u == t) return cur;
       for (int &i = iter[u]; i < adj[u].size(); ++i) {
-        edge &e = adj[u][i];
-        if (e.residue > 0 && level[u] < level[e.dst]) {
-          long long f = augment(e.dst, min(cur, e.residue));
+        edge &e = adj[u][i], &r = adj[e.dst][e.rev];
+        if (e.capacity > e.flow && level[u] < level[e.dst]) {
+          flow_type f = augment(e.dst, min(cur, e.capacity - e.flow));
           if (f > 0) {
-            e.residue -= f;
-            adj[e.dst][e.rev].residue += f;
+            e.flow += f;
+            r.flow -= f;
             return f;
           }
         }
       }
-      return 0ll;
+      return flow_type(0);
     };
     for (int u = 0; u < n; ++u) // initialize
-      for (auto &e: adj[u]) e.residue = e.capacity;
-    long long total = 0;
+      for (auto &e: adj[u]) e.flow = 0;
+
+    flow_type flow = 0;
     while (levelize() >= 0) {
       fill(all(iter), 0);
-      for (long long f; (f = augment(s, INF)) > 0; )
-        total += f;
-    } // level[u] == -1 ==> t-side
-    return total;
+      for (flow_type f; (f = augment(s, INF)) > 0; )
+        flow += f;
+    }
+    return flow;
   }
 };
 
