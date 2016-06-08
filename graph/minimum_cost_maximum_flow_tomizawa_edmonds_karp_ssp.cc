@@ -1,5 +1,5 @@
 //
-// Minimum Cost Maximum Flow (Tomizawa, Edmonds-Karp)
+// Minimum Cost Maximum Flow (Tomizawa, Edmonds-Karp's successive shortest path)
 //
 // Description:
 //   Given a directed graph G = (V,E) with nonnegative capacity c and cost w.
