@@ -46,51 +46,71 @@ using namespace std;
 #define snd second
 #define all(c) ((c).begin()), ((c).end())
 
-typedef int weight_type;
-const weight_type INF = 99999999;
-struct edge {
-  int src, dst;
-  weight_type weight;
-};
 struct graph {
+  typedef int weight_type;
+  const weight_type INF = 99999999;
+  struct edge {
+    int src, dst;
+    weight_type weight;
+  };
   int n;
   vector<vector<edge>> adj;
-  graph(int n = 0) : n(n) { }
+  graph(int n) : n(n), adj(n) { }
   void add_edge(int src, int dst, weight_type weight) {
-    // must be directed
-    // negative edges are allowed
-    n = max(n, max(src, dst)+1);
-    adj.resize(n);
     adj[src].push_back({src, dst, weight}); 
   }
-  pair<weight_type, weight_type> min_mean_cycle() {
-    vector<vector<weight_type>> dist(n+1, vector<weight_type>(n, INF));
-    dist[0][0] = 0;
-    for (int k = 0; k < n; ++k) 
-      for (int u = 0; u < n; ++u) 
-        for (auto e: adj[u]) 
-          dist[k+1][e.dst] = min(dist[k+1][e.dst], dist[k][e.src] + e.weight);
-    weight_type num = 1;
-    int den = 0;
-    for (int k = 0; k < n; ++k) 
-      for (int u = 0; u < n; ++u) 
-        if (dist[k][u] < INF)
-          if (num * (n-k) > (dist[n][u]-dist[k][u]) * den) {
-            num = (dist[n][u] - dist[k][u]);
-            den = n-k;
+  typedef pair<weight_type, int> fraction;
+  fraction min_mean_cycle() {
+    vector<vector<weight_type>> dist(n+1, vector<weight_type>(n));
+    vector<vector<int>> prev(n+1, vector<int>(n, -1));
+    fill(all(prev[0]), 0);
+
+    for (int k = 0; k < n; ++k) {
+      for (int u = 0; u < n; ++u) {
+        if (prev[k][u] < 0) continue;
+        for (auto e: adj[u]) {
+          if (prev[k+1][e.dst] < 0 ||
+              dist[k+1][e.dst] > dist[k][e.src] + e.weight) {
+            dist[k+1][e.dst] = dist[k][e.src] + e.weight;
+            prev[k+1][e.dst] = e.src;
           }
-    return {num, den}; // ratio = num/den
+        }
+      }
+    }
+    int v = -1;
+    fraction opt = {1, 0}; // +infty
+    for (int u = 0; u < n; ++u) {
+      fraction f = {-1, 0}; // -infty
+      for (int k = n-1; k >= 0; --k) {
+        if (prev[k][u] < 0) continue;
+        fraction g = {dist[n][u] - dist[k][u], n - k};
+        if (f.fst * g.snd < f.snd * g.fst) f = g;
+      }
+      if (opt.fst * f.snd > f.fst * opt.snd) { opt = f; v = u; }
+    }
+    if (v >= 0) { // found a loop
+      vector<int> p; // path
+      for (int k = n; p.size() < 2 || p[0] != p.back(); v = prev[k--][v]) 
+        p.push_back(v);
+      reverse(all(p));
+    }
+    return opt; 
   }
 };
 
 
 
 int main() {
-  graph solver;
-  int n = 10;
-  for (int i = 0; i < n; ++i) 
-    for (int j = 0; j < n; ++j) 
-      solver.add_edge(i, j, (rand() % (2*n)) - n);
+  srand( 4 );
+  int n = 4;
+  graph solver(n);
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      if (i == j) continue;
+      int c = (rand() % (2*n)) - n;
+      solver.add_edge(i, j, c);
+    }
+  }
 
   auto p = solver.min_mean_cycle();
   cout << p.fst << "/" << p.snd << endl;
