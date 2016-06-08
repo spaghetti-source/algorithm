@@ -34,44 +34,47 @@ using namespace std;
 
 const int INF = 1 << 30;
 struct graph {
-  int n;
+  typedef long long flow_type;
   struct edge {
     int src, dst;
-    int capacity, residue;
+    flow_type capacity, flow;
     size_t rev;
   };
+  int n;
   vector<vector<edge>> adj;
   graph(int n) : n(n), adj(n) { }
-  void add_edge(int src, int dst, int capacity) {
+  void add_edge(int src, int dst, flow_type capacity) {
     adj[src].push_back({src, dst, capacity, 0, adj[dst].size()});
     adj[dst].push_back({dst, src, 0, 0, adj[src].size()-1});
   }
   int max_flow(int s, int t) {
     vector<bool> visited(n);
-    function<int (int,int)> augment = [&](int u, int f = INF) {
-      if (u == t) return f;
+    function<flow_type(int,flow_type)> augment = [&](int u, flow_type cur) {
+      if (u == t) return cur;
       visited[u] = true;
       for (auto &e: adj[u]) {
-        if (!visited[e.dst] && e.residue > 0) {
-          int d = augment(e.dst, min(e.residue, f));
-          if (d > 0) {
-            e.residue -= d;
-            adj[e.dst][e.rev].residue += d;
-            return d;
+        if (!visited[e.dst] && e.capacity > e.flow) {
+          flow_type f = augment(e.dst, min(e.capacity - e.flow, cur));
+          if (f > 0) {
+            e.flow += f;
+            adj[e.dst][e.rev].flow -= f;
+            return f;
           }
         }
       }
-      return 0;
+      return flow_type(0);
     };
     for (int u = 0; u < n; ++u)
-      for (auto &e: adj[u]) e.residue = e.capacity;
+      for (auto &e: adj[u]) e.flow = 0;
 
-    int total = 0;
-    for (int f = 1; f; ) {
+    flow_type flow = 0;
+    while (1) {
       fill(all(visited), false);
-      total += (f = augment(s, INF));
-    } // { u : visited[u] == true } is s-side
-    return total;
+      flow_type f = augment(s, INF);
+      if (f == 0) break;
+      flow += f;
+    }
+    return flow;
   }
 };
 
