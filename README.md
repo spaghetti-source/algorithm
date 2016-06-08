@@ -96,8 +96,12 @@ This category should be reorganized.
 - graph/link_cut_tree.cc
 - graph/maximal_cliques.cc
 - graph/maximum_cut.cc
-- graph/maximum_flow_dinic.cc
-- graph/maximum_flow_ford_fulkerson.cc
+- [Maximum Flow (Ford-Fulkerson)](graph/maximum_flow_ford_fulkerson.cc)
+- [Maximum Flow (Edmonds-Karp)](graph/maximum_flow_edmonds_karp.cc)
+- [Maximum Flow (Dinic's blocking flow)](graph/maximum_flow_dinic.cc)
+- [Maximum Flow (Goldberg-Tarjan's preflow-push)](graph/maximum_flow_goldberg_tarjan.cc)
+- [Minimum Cost Maximum Flow (Tomizawa, Edmonds-Karp's successive shortest paths](graph/minimum_cost_maximum_flow_tomizawa_edmonds_karp_ssp.cc)
+- [Minimum Cost Maximum Flow (Goldberg-Tarjan's minimum mean cycle canceling](graph/minimum_cost_maximum_flow_goldberg_tarjan_mmcc.cc)
 - graph/minimum_feedback_arc_set.cc
 - graph/minimum_mean_cycle.cc
 - graph/reachability.cc
@@ -105,7 +109,7 @@ This category should be reorganized.
 - graph/strongly_connected_component_gabow.cc
 - graph/strongly_connected_component_kosaraju.cc
 - graph/strongly_connected_component_tarjan.cc
-- graph/tomizawa_edmonds_karp.cc
+
 - graph/transitive_reduction_dag.cc
 - graph/traveling_salesman.cc
 - graph/tree_decomposition.cc
