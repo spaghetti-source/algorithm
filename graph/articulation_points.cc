@@ -5,12 +5,20 @@
 //   Let G = (V, E). If G-v is disconnected, v in V is said to
 //   be an articulation point. If G has no articulation points,
 //   it is said to be biconnected.
+//
 //   A biconnected component is a maximal biconnected subgraph.
 //   The algorithm finds all articulation points and biconnected 
 //   components.
 //
+//   The most important fact is that by contracting biconnected
+//   components we obtain a tree, which is called the block tree.
+//
+//
 // Algorithm:
 //   Hopcroft-Tarjan's DFS based algorithm.
+//
+//   Single DFS finds a block tree rooted from the component
+//   that contains the specified root.
 //
 // Complexity:
 //   O(n + m).
@@ -46,36 +54,39 @@ struct graph {
     adj[src].push_back(dst);
     adj[dst].push_back(src);
   }
+
+  void biconnected_components() {
+    vector<int> num(n), low(n), S;
+    unordered_set<int> arts;
+
+    function<void(int,int,int&)> dfs = [&](int p, int u, int &t) { 
+      num[u] = low[u] = ++t; 
+      S.push_back(u);
+      for (int v: adj[u]) {
+        if (v == p) continue;
+        if (num[v] == 0) {
+          dfs(u, v, t);
+          low[u] = min(low[u], low[v]);
+          if (num[u] <= low[v]) {
+            if (num[u] != 1 || num[v] > 2) {
+              // here, u is an articulation point if
+              //   (a). u is non-root
+              //   (b). u is root with two more children 
+            }
+            vector<int> C = {u}; // biconnected component
+            while (C.back() != v) {
+              C.push_back(S.back());
+              S.pop_back();
+            }
+          }
+        } else low[u] = min(low[u], num[v]);
+      }
+    };
+    for (int u = 0, t; u < n; ++u) 
+      if (!num[u]) dfs(-1, u, t = 0);
+    cout << arts.size() << endl;
+  }
 };
-
-void biconnected_components(graph g) {
-  vector<int> arts(g.n), num(g.n), low(g.n), S;
-  vector<vector<int>> comps;
-  function<void(int,int,int&)> dfs = [&](int p, int i, int &t) { 
-    num[i] = low[i] = ++t; 
-    S.push_back(i);
-    for (int j: g.adj[i]) {
-      if (j == p) continue;
-      if (num[j] == 0) {
-        dfs(i, j, t);
-        low[i] = min(low[i], low[j]);
-        if (num[i] <= low[j]) {
-          if (num[i] != 1 || low[j] > 2) arts[i] = true;
-          for (comps.push_back({i}); comps.back().back() != j; S.pop_back()) 
-            comps.back().push_back(S.back()); // 
-        }
-      } else low[i] = min(low[i], num[j]);
-    }
-  };
-  for (int i = 0, t; i < g.n; ++i)
-    if (num[i] == 0) dfs(-1, i, t = 0);
-
-  // SPOJ SUBMERGE
-  int count = 0;
-  for (int i = 0; i < g.n; ++i) 
-    count += arts[i];
-  printf("%d\n", count);
-}
 
 int main() {
   for (int n, m; ~scanf("%d %d", &n, &m) && n; ) {
@@ -84,6 +95,6 @@ int main() {
       int u, v; scanf("%d %d", &u, &v);
       g.add_edge(u-1, v-1);
     }
-    biconnected_components(g);
+    g.biconnected_components();
   }
 }
