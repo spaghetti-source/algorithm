@@ -47,6 +47,7 @@ struct small_graph { // assume: |V| <= 64
     N[1ull<<dst] |= (1ull<<src);
   }
   int maximal_cliques() {
+    // enumerate cliques that include R, exclude X, arbitrary P.
     function<int (state,state,state)> rec = [&](state R, state P, state X) {
       if (!(P | X)) { // R is a bitset of maximal clique
         for (int i = 0; i < n; ++i, R >>= 1) 
