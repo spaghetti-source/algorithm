@@ -22,8 +22,8 @@
 
 #include <iostream>
 #include <vector>
-#include <cstdio>
 #include <queue>
+#include <cstdio>
 #include <algorithm>
 #include <functional>
 
@@ -33,49 +33,49 @@ using namespace std;
 #define snd second
 #define all(c) ((c).begin()), ((c).end())
 
-const long long INF = (1ll << 50);
+const int INF = 1 << 30;
 struct graph {
-  typedef long long flow_type;
+  int n;
   struct edge {
     int src, dst;
-    flow_type capacity, flow;
+    int capacity, residue;
     size_t rev;
   };
-  int n;
+  edge &rev(edge e) { return adj[e.dst][e.rev]; };
+
   vector<vector<edge>> adj;
   graph(int n) : n(n), adj(n) { }
-  void add_edge(int src, int dst, flow_type capacity) {
+  void add_edge(int src, int dst, int capacity) {
     adj[src].push_back({src, dst, capacity, 0, adj[dst].size()});
     adj[dst].push_back({dst, src, 0, 0, adj[src].size()-1});
   }
   int max_flow(int s, int t) {
-    vector<bool> visited(n);
-    function<flow_type(int,flow_type)> augment = [&](int u, flow_type cur) {
-      if (u == t) return cur;
-      visited[u] = true;
-      for (auto &e: adj[u]) {
-        if (!visited[e.dst] && e.capacity > e.flow) {
-          flow_type f = augment(e.dst, min(e.capacity - e.flow, cur));
-          if (f > 0) {
-            e.flow += f;
-            adj[e.dst][e.rev].flow -= f;
-            return f;
+    for (int u = 0; u < n; ++u)
+      for (auto &e: adj[u]) e.residue = e.capacity;
+    int total = 0;
+    while (1) {
+      vector<int> prev(n, -1); prev[s] = -2;
+      queue<int> que; que.push(s);
+      while (!que.empty() && prev[t] == -1) {
+        int u = que.front(); que.pop();
+        for (edge &e: adj[u]) {
+          if (prev[e.dst] == -1 && e.residue > 0) {
+            prev[e.dst] = e.rev;
+            que.push(e.dst);
           }
         }
       }
-      return flow_type(0);
-    };
-    for (int u = 0; u < n; ++u)
-      for (auto &e: adj[u]) e.flow = 0;
-
-    flow_type flow = 0;
-    while (1) {
-      fill(all(visited), false);
-      flow_type f = augment(s, INF);
-      if (f == 0) break;
-      flow += f;
-    }
-    return flow;
+      if (prev[t] == -1) break;
+      int inc = INF;
+      for (int u = t; u != s; u = adj[u][prev[u]].dst) 
+        inc = min(inc, rev(adj[u][prev[u]]).residue);
+      for (int u = t; u != s; u = adj[u][prev[u]].dst) {
+        adj[u][prev[u]].residue += inc;
+        rev(adj[u][prev[u]]).residue -= inc;
+      }
+      total += inc;
+    } // { u : visited[u] == true } is s-side
+    return total;
   }
 };
 
