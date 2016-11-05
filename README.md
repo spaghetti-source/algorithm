@@ -151,6 +151,11 @@ This category should be reorganized.
 - number_theory/modular_arithmetics.cc
 - number_theory/primes.cc
 
+
+## Backtracking
+
+- n_queen_problem
+
 ## Other
 
 This category should be reorganized.
