@@ -7,7 +7,4 @@ These codes are published in **public domain.**
 You can use the codes for *any purpose without any warranty*.
 
 
-author: Takanori MAEHARA
-- e-mail: maehara@prefield.com
-- web: http://www.prefield.com
-- twitter: @tmaehara
+author: Takanori MAEHARA (web: http://www.prefield.com, e-mail: maehara@prefield.com, twitter: @tmaehara)
