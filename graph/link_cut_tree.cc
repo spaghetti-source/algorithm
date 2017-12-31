@@ -1,8 +1,11 @@
 // 
-// Link Cut Tree
+// Link Cut Tree (Slator-Tarjan)
 //
 // Decription:
-//   It maintains rooted forests with link/cut operations
+//   It maintains rooted arborescences with the following operations
+//     link(u,v)     : add link from u to v
+//     cut(u)        : cut link from u (to the root direction)
+//     lca(u,v)      : least common ancestor of u and v
 //
 // Algorithm:
 //   Classify links into solid and dashed.
@@ -18,103 +21,96 @@
 //   D. D. Sleator and R. E. Tarjan (1983):
 //   A Data Structure for Dynamic Trees.
 //   Journal oF Computer and System Sciences, vol. 26, no. 3, pp. 362-391.
+//
+// Verified: AOJ Spaceships
+
 
 #include <iostream>
 #include <cstdio>
 #include <vector>
+#include <cassert>
 
 using namespace std;
 
 struct link_cut_tree {
   struct node { 
-    int x, s; // value and sum
-    node *ch[2], *p;
+    node *child[2], *parent;
   };
-  int sum(node *t) { return t ? t->s : 0; }
-  node *update(node *t) {
-    if (t) t->s = t->x + sum(t->ch[0]) + sum(t->ch[1]);
-    return t;
+  bool is_root(node *x) {
+    return !x->parent || (x->parent->child[0] != x 
+                      &&  x->parent->child[1] != x);
   }
-  node *make_node(int x) { return new node({x, x, 0, 0, 0}); }
-
-  int dir(node *t) { return t != t->p->ch[0]; }
-  bool is_root(node *t) {
-    return !t->p || (t->p->ch[0] != t && t->p->ch[1] != t);
+  int dir(node *x) { return x->parent && x->parent->child[1] == x; }
+  void rot(node* t) {
+    node *p = t->parent, *g = p->parent;
+    int d = dir(t);
+    p->child[d] = t->child[!d];
+    if (p->child[d]) p->child[d]->parent = p;
+    if (!is_root(p)) g->child[dir(p)] = t;
+    t->parent = g;
+    t->child[!d] = p;
+    p->parent = t;
   }
-  void connect(node *p, node *t, int d) {
-    p->ch[d] = t; if (t) t->p = p;
-    update(p);
-  }
-  void rot(node *t) {
-    node *p = t->p;
-    int d = dir(t); 
-    if (!is_root(p)) connect(p->p, t, dir(p));
-    else             t->p = p->p;
-    connect(p, t->ch[!d], d);
-    connect(t, p, !d);
-  }
-  void splay(node *t) {
-    for (; !is_root(t); rot(t))
-      if (!is_root(t->p)) rot(dir(t) == dir(t->p) ? t->p : t);
-  }
-  node *expose(node *t) {
-    node *l = 0;
-    for (node *s = t; s; s = s->p) {
-      splay(s);
-      connect(s, l, 1);
-      l = s;
+  void splay(node *x) {
+    while (!is_root(x)) {
+      if (!is_root(x->parent)) {
+        if (dir(x) == dir(x->parent)) rot(x->parent); 
+        else                          rot(x);
+      }
+      rot(x);
     }
-    splay(t);
-    return l;
   }
-  void link(node *t, node *p) { 
-    expose(t);
-    expose(p);
-    t->p = p;
+  node *expose(node *x) {
+    node *r = 0;
+    for (node *p = x; p; p = p->parent) {
+      splay(p);
+      p->child[1] = r;
+      r = p;
+    }
+    splay(x);
+    return r;
   }
-  void cut(node *t) {
-    expose(t); 
-    t->ch[0] = t->ch[0]->p = 0;
+
+  vector<node> ns;
+  link_cut_tree(int n) : ns(n) {
+    for (int i = 0; i < n; ++i) 
+      ns[i].child[0] = ns[i].child[1] = ns[i].parent = 0;
   }
-  node *lca(node *s, node *t) {
-    expose(s);
-    node *u = expose(t);
-    return !s->p ? 0 : u;
+  void link(int x, int y) {
+    expose(&ns[x]);
+    expose(&ns[y]);
+    ns[y].child[1] = &ns[x];
+    ns[x].parent = &ns[y];
   }
-  int sum_to_root(node *t) {
-    expose(t);
-    return sum(t->ch[0]) + t->x;
+  void cut(int x) {
+    expose(&ns[x]); 
+    node *y = ns[x].child[0];
+    ns[x].child[0] = y->parent = 0;
+  }
+  int lca(int x, int y) {
+    expose(&ns[x]);
+    node *u = expose(&ns[y]);
+    return ns[x].parent ? u - &ns[0] : -1;
   }
 };
 
 int main() {
-  link_cut_tree LCT;
-  int n, m; cin >> n >> m;
+  int n, q, t, a, b;
+  scanf("%d %d", &n, &q);
 
-  vector<link_cut_tree::node*> a(n);
-  for (int i = 0; i < n; ++i) {
-    a[i] = LCT.make_node(i+1);
-  }
-
-  int u, v;
-  link_cut_tree::node *p;
-  for (int k = 0; k < m; ++k) {
-    int t; cin >> t;
-    switch (t) {
-      case 1:
-        cin >> u >> v; --u; --v;
-        LCT.link(a[u], a[v]);
-        break;
-      case 2:
-        cin >> u; --u;
-        LCT.cut(a[u]);
-        break;
-      case 3:
-        cin >> u >> v; --u; --v;
-        p = LCT.lca(a[u], a[v]);
-        if (!p) cout << "-1" << endl;
-        else    cout << p->x << endl;
-      break;
+  link_cut_tree LCT(n);
+  for (int i = 0; i < q; ++i) {
+    scanf("%d", &t);
+    if (t == 1) {
+      scanf("%d %d", &a, &b);
+      LCT.link(a-1, b-1);
+    } else if (t == 2) {
+      scanf("%d", &a);
+      LCT.cut(a-1);
+    } else {
+      scanf("%d %d", &a, &b);
+      int c = LCT.lca(a-1, b-1);
+      printf("%d\n", c < 0 ? c : c+1);
     }
   }
 }
