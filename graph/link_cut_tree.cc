@@ -42,12 +42,12 @@ struct link_cut_tree {
   }
   int dir(node *x) { return x->parent && x->parent->child[1] == x; }
   void rot(node* t) {
-    node *p = t->parent, *g = p->parent;
+    node *p = t->parent;
     int d = dir(t);
     p->child[d] = t->child[!d];
     if (p->child[d]) p->child[d]->parent = p;
-    if (!is_root(p)) g->child[dir(p)] = t;
-    t->parent = g;
+    if (!is_root(p)) p->parent->child[dir(p)] = t;
+    t->parent = p->parent;
     t->child[!d] = p;
     p->parent = t;
   }
