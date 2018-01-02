@@ -2,34 +2,27 @@
 // Cartesian Tree
 //
 // Description:
-//   For a given sequence x, the Cartesian tree is recursively
+//   For a given sequence xs, the Cartesian tree is recursively
 //   defined as follows:
-//   - root is the minimum in x.
-//   - the left child is the Cartesian tree for the the left of the min.,
-//     and the right child is the Cartesian tree for the right of the min.
+//   - the root is the minimum in xs.
+//   - the left child is the Cartesian tree for the the left segment,
+//     and the right child is the Cartesian tree for the right segment.
+//   It is constructed in O(n) time by the left-to-right traversal.
+//
+//   By using the Cartesian tree, we can solve
+//   - Sorting in O(n log k) time, where k is the number of consecutive
+//     sorted subsegments.
+//   - LCA(i,j) = RMQ(i,j). Thus, by using the Tarjan's Offline LCA,
+//     we can solve m RMQs in O(m a(n)) time.
 // 
-// Algorithm:
-//   Left-to-right construction. 
-//
-// Applications:
-//   In order traversal gives the original sequence. 
-//   Sorting can be performed in O(n log k)
-//   LCA of two element gives RMQ in original sequence.
-//
-// Complexity:
-//   construction: O(n)
-//   sort: O(n log k) by using priority queue.
-//   offline RMQ: O(n + q) by Tarjan's offline LCA.
-//
 // Verified:
-//   SPOJ11772, SPOJ1005604 for RMQ.
-//
+//   SPOJ RPLN: http://www.spoj.com/problems/RPLN/
+// 
 // References:
 //   C. Levcopoulos and O. Petersson (1989):
 //   Heapsort - Adapted for Presorted Files.
 //   in Proceedings of the Workshop on Algorithms and Data Structures, 
 //   pp. 499-509.
-
 
 #include <iostream>
 #include <vector>
@@ -45,76 +38,83 @@ using namespace std;
 #define all(c) ((c).begin()), ((c).end())
 
 template <class T>
-struct cartesian_tree {
+struct CartesianTree {
   int n, root;
-  vector<T> x;
-  vector<int> l, r, p;
-  cartesian_tree(const vector<T> &x) 
-    : n(x.size()), x(x), l(n,-1), r(n,-1), p(n,-1) {
+  vector<T> xs;
+  struct Node {
+    int left = -1, right = -1, parent = -1;
+  };
+  vector<Node> node;
+  CartesianTree(const vector<T> &xs) : n(xs.size()), xs(xs), node(n) {
     root = 0;
     for (int i = 1; i < n; ++i) {
       int j = i-1;
-      while (p[j] >=0 && x[i] < x[j]) j = p[j];
-      if (x[i] < x[j]) {
-        p[j] = i;
-        l[i] = j;
+      while (node[j].parent >=0 && xs[i] < xs[j]) 
+        j = node[j].parent;
+      if (xs[i] < xs[j]) {
+        node[j].parent = i;
+        node[i].left = j;
         root = i;
       } else {
-        if (r[j] >= 0) p[r[j]] = i;
-        l[i] = r[j];
-        p[i] = j;
-        r[j] = i;
+        if (node[j].right >= 0) node[node[j].right].parent = i;
+        node[i].left = node[j].right;
+        node[i].parent = j;
+        node[j].right = i;
       } 
     }
   }
   // In-order traverse gives an original sequence
   void traverse(int t, int tab = 0) {
     if (t < 0) return;
-    traverse(l[t], tab + 2);
+    traverse(node[t].left, tab + 2);
     for (int i = 0; i < tab; ++i) cout << " ";
-    cout << x[t] << endl;
-    traverse(r[t], tab + 2);
+    cout << xs[t] << endl;
+    traverse(node[t].right, tab + 2);
   }
   void traverse() {
     traverse(root);
   }
   // Sorting in O(n log k) by Levcopoulos-Petersson 
   void sort() {
-    auto comp = [&](int i, int j) { return x[i] > x[j]; };
+    auto comp = [&](int i, int j) { return xs[i] > xs[j]; };
     priority_queue<int, vector<int>, decltype(comp)> que(comp);
     que.push(root);
     while (!que.empty()) {
       int t = que.top(); que.pop();
-      cout << x[t] << " ";
-      if (l[t] >= 0) que.push(l[t]);
-      if (r[t] >= 0) que.push(r[t]);
+      cout << xs[t] << " ";
+      if (node[t].left >= 0) que.push(node[t].left);
+      if (node[t].right >= 0) que.push(node[t].right);
     }
     cout << endl;
   }
 
-  struct union_find {
-    vector<int> p; 
-    union_find(int n) : p(n, -1) { };
+  struct UnionFind {
+    vector<int> parent; // parent[root] is the negative of the size.
+    UnionFind(int n) : parent(n, -1) { };
     bool unite(int u, int v) { 
-      if ((u = root(u)) == (v = root(v))) return false;
-      if (p[u] > p[v]) swap(u, v);
-      p[u] += p[v]; p[v] = u;
+      u = root(u); v = root(v);
+      if (u == v) return false;
+      if (parent[u] > parent[v]) swap(u, v);
+      parent[u] += parent[v]; parent[v] = u;
       return true;
     }
-    int root(int u) { return p[u] < 0 ? u : p[u] = root(p[u]); }
+    bool find(int u, int v) { return root(u) == root(v); }
+    int root(int u) { return parent[u] < 0 ? u : parent[u] = root(parent[u]); }
+    int size(int u) { return -parent[root(u)]; }
   };
+
   struct query { int u, v, a; };
-  void range_min_queries(vector<query> &queries) {
+  void rangeMinQueries(vector<query> &queries) {
     vector<vector<query*>> Q(n);
     for (auto &q: queries) {
       Q[q.u].push_back(&q);
       Q[q.v].push_back(&q);
     }
-    union_find uf(n);
+    UnionFind uf(n);
     vector<int> anc(n), color(n);
     iota(all(anc), 0);
     function<void (int)> rec = [&](int u) {
-      for (int c: {l[u], r[u]}) {
+      for (int c: {node[u].left, node[u].right}) {
         if (c < 0) continue;
         rec(c);
         uf.unite(c, u);
@@ -140,14 +140,14 @@ int main() {
     vector<int> x(n);
     for (int i = 0; i < n; ++i) 
       scanf("%d", &x[i]);
-    cartesian_tree<int> T(x);
+    CartesianTree<int> T(x);
 
-    vector<cartesian_tree<int>::query> qs(q);
+    vector<CartesianTree<int>::query> qs(q);
     for (int i = 0; i < q; ++i) {
       scanf("%d %d", &qs[i].u, &qs[i].v);
       --qs[i].u; --qs[i].v;
     }
-    T.range_min_queries(qs);
+    T.rangeMinQueries(qs);
     for (auto q: qs) 
       printf("%d\n", x[q.a]);
   }
