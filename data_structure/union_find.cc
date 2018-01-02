@@ -39,7 +39,7 @@ struct UnionFind {
     u = root(u); v = root(v);
     if (u == v) return false;
     if (parent[u] > parent[v]) swap(u, v);
-    parent[u] += parent[v]; parent[v] += u;
+    parent[u] += parent[v]; parent[v] = u;
     return true;
   }
   bool find(int u, int v) { return root(u) == root(v); }
