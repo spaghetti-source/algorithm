@@ -8,12 +8,11 @@
 //   holds. Kung-Luccio-Preparata proposed an algorithm to compute
 //   the all set of dominating points in O(n log n) time.
 //
-//   It maintains a data structure to check the domination efficiently 
-//   in (y,z)-plane, and proceed the points in the decreasing order of x.
-//   By the processing order, the new point is only dominated by the
-//   previously processed points. Also, by the processing order, the
-//   new point is dominated if its (y,z) coordinate is dominated.
-//   By using a data structure, it is efficiently checked.
+//   It maintains a data structure to check the domination in (y,z) plane,
+//   and proceed the points in the decreasing order of x.
+//   By the processing order, the new point is never dominated by the latter
+//   points and is dominated by the previous points if its (y,z) coordinate
+//   is dominated by them.
 //
 // Complexity:
 // 
