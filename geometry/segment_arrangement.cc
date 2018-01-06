@@ -10,6 +10,10 @@
 // Complexity:
 //   O(k log n), where k is the size of input.
 //
+// Verified:
+//   AOJ 1226
+//   AOJ 2448
+//
 // References:
 //   CGAA
 //
