@@ -88,34 +88,47 @@ vector<Point> intersect(Segment s, Segment t) {
   return ps;
 }
 
+
+// 
+// each vertex has one incident edge
+// each edge has the origin vertex, twin edge, and the left face.
+// two edges (prev, next) representing a list of edges surrounding a face. 
+//
 struct DoublyConnectedEdgeList {
-  struct Vertex { int edge; }; // incident
-  struct Edge { int vertex, twin, prev, next, face; }; // origin, twin, incident list, left face
-  struct Face { int edge; }; // any incident face
+  vector<int> incident_edge; // vertex
+  vector<int> origin, twin, prev, next, incident_face; // edge
+  vector<int> component; // face
+  int edges()    const { return origin.size(); }
+  int vertices() const { return incident_edge.size(); }
+  int faces()    const { return component.size(); }
+
   vector<Point> point;
-  vector<Vertex> vertex;
-  vector<Edge> edge;
-  vector<Face> face;
   int newVertex(Point p, int e = -1) {
     point.push_back(p);
-    vertex.push_back({e});
-    return vertex.size()-1;
+    incident_edge.push_back(e);
+    return vertices()-1;
   }
-  int newEdge(int vertex = -1) {
-    edge.push_back({vertex, -1, -1, -1, -1});
-    return edge.size()-1;
+  int newEdge(int o = -1) {
+    origin.push_back(o);
+    twin.push_back(-1);
+    prev.push_back(-1);
+    next.push_back(-1);
+    incident_face.push_back(-1);
+    return edges()-1;
+  }
+  int newFace(int e = -1) {
+    component.push_back(e);
+    return component.size()-1;
   }
   void completeFaces() {
-    face.clear();
-    for (int e = 0; e < edge.size(); ++e) edge[e].face = -1;
-    for (int e = 0; e < edge.size(); ++e) {
-      if (edge[e].face >= 0) continue;
-      int f = face.size();
-      face.push_back({e});
-      int x = e;
+    component.clear();
+    fill(all(incident_face), -1);
+    for (int e = 0; e < edges(); ++e) {
+      if (incident_face[e] >= 0) continue;
+      int f = newFace(e), x = e;
       do {
-        edge[x].face = f;
-        x = edge[edge[x].twin].prev;
+        incident_face[x] = f;
+        x = next[x];
       } while (x != e);
     }
   }
@@ -183,7 +196,6 @@ struct Arrangement : DoublyConnectedEdgeList {
     func(x);
     process(x->right, func);
   }
-
   Arrangement(vector<Segment> segs_) : segs(segs_) {
     ns.resize(segs.size());
     set<Point> events;
@@ -213,7 +225,7 @@ struct Arrangement : DoublyConnectedEdgeList {
         }
         return -sign(cross(s.p - p, s.q - p));
       };
-      auto z = split(root, cond);
+      auto z = split(root, cond); 
       vector<Node*> inserter;
       process(get<1>(z), [&](Node *x) {
         int v = last[x->index];
@@ -221,8 +233,8 @@ struct Arrangement : DoublyConnectedEdgeList {
           int e = newEdge(u), f = newEdge(v);
           adj[u][v] = e;
           adj[v][u] = f;
-          edge[e].twin = f;
-          edge[f].twin = e;
+          twin[e] = f;
+          twin[f] = e;
         }
         if (!R[p].count(x->index)) 
           inserter.push_back(x);
@@ -230,6 +242,7 @@ struct Arrangement : DoublyConnectedEdgeList {
       for (int i: L[p]) 
         if (!R[p].count(i))
           inserter.push_back(&ns[i]);
+
       sort(all(inserter), [&](Node *x, Node *y) {
         const Segment &s = segs[x->index], &t = segs[y->index];
         return sign(cross(s.q - s.p, t.q - t.p)) >= 0;
@@ -254,27 +267,32 @@ struct Arrangement : DoublyConnectedEdgeList {
       }
       root = merge(merge(get<0>(z), root), get<2>(z));
     }
+    vector<int> next_inc(next.size()), prev_inc(prev.size());
     for (auto &pp: adj) {
       int u = pp.fst;
       vector<int> es;
       for (auto z: pp.snd) es.push_back(z.snd);
-      sort(all(es), [&](int e, int f) {
+      sort(all(es), [&](int e, int f) { // polar sort
         auto quad = [](Point p) {
           for (int i = 1; i <= 4; ++i, swap(p.x = -p.x, p.y))
             if (p.x > 0 && p.y >= 0) return i;
           return 0;
         };
-        const Point p = point[edge[edge[e].twin].vertex] - point[edge[e].vertex];
-        const Point q = point[edge[edge[f].twin].vertex] - point[edge[f].vertex];
+        const Point p = point[origin[twin[e]]] - point[origin[e]];
+        const Point q = point[origin[twin[f]]] - point[origin[f]];
         if (quad(p) != quad(q)) return quad(p) < quad(q);
         return sign(cross(p, q)) > 0;
       });
-      vertex[u].edge = es.back();
-      for (int e: es) {
-        edge[vertex[u].edge].next = e;
-        edge[edge[vertex[u].edge].next].prev = vertex[u].edge;
-        vertex[u].edge = edge[vertex[u].edge].next;
+      incident_edge[u] = es[0];
+      for (int i = 0; i < es.size(); ++i) {
+        int j = (i + 1) % es.size();
+        next_inc[es[i]] = es[j];
+        prev_inc[es[j]] = es[i];
       }
+    }
+    for (int e = 0; e < edges(); ++e) {
+      next[e] = prev_inc[twin[e]];
+      prev[e] = twin[next_inc[e]];
     }
   }
 };
@@ -299,14 +317,14 @@ void AOJ1226() {
     arr.completeFaces();
 
     double result = 0;
-    for (int f = 0; f < arr.face.size(); ++f) {
+    for (int f = 0; f < arr.faces(); ++f) {
       double area = 0;
-      int e = arr.face[f].edge;
+      int e = arr.component[f];
       do {
-        area += cross(arr.point[arr.edge[e].vertex], 
-                      arr.point[arr.edge[arr.edge[e].twin].vertex]),
-        e = arr.edge[arr.edge[e].twin].prev;
-      } while (e != arr.face[f].edge);
+        area += cross(arr.point[arr.origin[e]],
+                      arr.point[arr.origin[arr.twin[e]]]),
+        e = arr.next[e];
+      } while (e != arr.component[f]);
       result = max(result, area);
     }
     printf("%.6f\n", result/2);
@@ -324,21 +342,20 @@ void AOJ2448() {
   arr.completeFaces();
 
   double result = 0;
-  for (int f = 0; f < arr.face.size(); ++f) {
+  for (int f = 0; f < arr.faces(); ++f) {
     double area = 0;
-    int e = arr.face[f].edge;
+    int e = arr.component[f];
     do {
-      area += cross(arr.point[arr.edge[e].vertex], 
-                    arr.point[arr.edge[arr.edge[e].twin].vertex]),
-      e = arr.edge[arr.edge[e].twin].prev;
-    } while (e != arr.face[f].edge);
+      area += cross(arr.point[arr.origin[e]],
+                    arr.point[arr.origin[arr.twin[e]]]),
+      e = arr.next[e];
+    } while (e != arr.component[f]);
     if (area > 0) result += area;
   }
   printf("%.12f\n", result/2);
 }
 
 int main() {
-  // AOJ2448();
-  AOJ1226();
+  AOJ2448();
+  //AOJ1226();
 }
-
