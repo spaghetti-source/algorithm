@@ -1,15 +1,32 @@
 //
-// Suffix Automaton
+// Suffix Automaton (aka. Suffix Directed Acyclic Word Graph)
 //
 // Description:
 //
 //   It is an automaton that accepts all suffixes
-//   of a given string.
+//   of a given string. It can be constructed in O(n) time
+//   by using Blumer et al.'s online construction.
+//
+//   Note that a factor automaton is obtained from 
+//   the suffix automaton by setting the all states as terminal.
+//
+// Complexity:
+//   O(n)
 //
 // Verified:
 //   
 //   SPOJ_SUBST1
 //   SPOJ_SUBLEX
+//
+// References:
+//   A. Blumer, J. Blumer, D. Haussler, A. Ehrenfeucht, 
+//   M. T. Chen, and J. Seiferas (1985):
+//   The smallest automation recognizing the subwords of a text.
+//   Theoretical Computer Science, vol. 40, pp. 31-55.
+//
+//   M. Crochemore, and W. Rytter (1994):
+//   Text Algorithms.
+//   Oxford University Press.
 //
 #include <bits/stdc++.h>
 
@@ -21,32 +38,33 @@ using namespace std;
 #define TEST(s) if (!(s)) { cout << __LINE__ << " " << #s << endl; exit(-1); }
 
 struct SuffixAutomaton {
-  vector<int> length = {0}, parent = {-1};
+  vector<int> length = {0}; // maximum length corresponding to the node
+  vector<int> link = {-1};  // suffix link of the node
   vector<map<int,int>> next = {map<int,int>()};
   int size() const { return next.size(); }
 
   int extend(int p, int c) {
     int head = next.size();
-    next.push_back(map<int,int>());
     length.push_back(length[p]+1);
-    parent.push_back(0);
+    link.push_back(0);
+    next.push_back(map<int,int>());
     while (p >= 0 && !next[p].count(c)) {
       next[p][c] = head;
-      p = parent[p];
+      p = link[p];
     }
     if (p >= 0) {
       int q = next[p][c];
       if (length[p]+1 == length[q]) {
-        parent[head] = q;
+        link[head] = q;
       } else { 
         int clone = next.size(); // clone of q
         length.push_back(length[p]+1);
-        parent.push_back(parent[q]); 
+        link.push_back(link[q]); 
         next.push_back(next[q]);
-        parent[q] = parent[head] = clone;
+        link[q] = link[head] = clone;
         while (p >= 0 && next[p][c] == q) {
           next[p][c] = clone;
-          p = parent[p];
+          p = link[p];
         }
       }
     }
