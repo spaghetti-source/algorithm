@@ -11,4 +11,4 @@ author: Takanori MAEHARA (web: http://www.prefield.com, e-mail: maehara@prefield
 
 # Recruiting
 
-I am a researcher at *RIKEN Center for Advanced Intelligence Project*, which is a Japanese governmental academic research institute on artificial intelligence related areas. In particular, I am working on discrete algorithms (including topics in this github repository). We are hiring *strong programmers/researchers* who has some achievements in some competitions. If you are interested in, please feel free to contact me.
+I am a researcher at *RIKEN Center for Advanced Intelligence Project*, which is a Japanese governmental academic research institute. I am working on discrete algorithms (including topics in this github repository). We are hiring *strong programmers/researchers* who has some achievements in some competitions. If you are interested in, please feel free to contact me.
