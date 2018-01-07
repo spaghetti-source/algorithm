@@ -8,7 +8,7 @@
 //   time, where k is the size of output.
 //
 // Complexity:
-//   O(k log n), where k is the size of input.
+//   O(k log n), where k is the size of output.
 //
 // Verified:
 //   AOJ 1226
