@@ -22,7 +22,7 @@
 //   - The all terms have been added pj
 //   Thus, by using a data structure that supports these operations, 
 //   we can perform the DP efficiently. The data structure is implemented 
-//   by a sliding maximum queue with one additional integer parameter.
+//   by a maximum queue with one accumulation parameter.
 //
 // Complexity:
 //   
@@ -36,30 +36,6 @@ using namespace std;
 #define snd second
 #define all(c) ((c).begin()), ((c).end())
 #define TEST(s) if (!(s)) { cout << __LINE__ << " " << #s << endl; exit(-1); }
-
-// Minimum Queue or Sliding Minimum Data Dtructure
-//
-// 3 1 4 1
-// 1 4 1
-template <class T>
-struct MinQueue {
-  queue<T> que;
-  deque<T> peek;
-  T alpha = 0;
-  void push(T a) {
-    a -= alpha;
-    que.push(a);
-    while (!peek.empty() && peek.back() > a) peek.pop_back();
-    peek.push_back(a);
-  }
-  void pop() {
-    if (que.front() == peek.front()) peek.pop_front();
-    que.pop();
-  }
-  T front() const { return que.front()+alpha; }
-  T min() const { return peek.front()+alpha; }
-  void add(T a) { alpha += a; } // does not change the ordering
-};
 
 int boundedKnapsackDP(vector<int> ps,
                        vector<int> ws,
