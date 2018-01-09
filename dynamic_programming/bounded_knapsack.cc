@@ -4,7 +4,7 @@
 // Description:
 // 
 //   There are n kinds of items of profit pi, weight bi, and 
-//   amount mi (i in {0...n}). For a given W, we want to select items 
+//   amount mi (i in {0...n-1}). For a given W, we want to select items 
 //   to maximize the total profit subject to the total weight
 //   is at most W and the number of each item is at most mi.
 //
