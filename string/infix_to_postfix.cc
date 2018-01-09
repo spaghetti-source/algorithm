@@ -16,7 +16,6 @@
 #include <iostream>
 #include <stack>
 #include <vector>
-#include <cstdio>
 #include <algorithm>
 #include <functional>
 #include <sstream>
@@ -43,9 +42,9 @@ string infix_to_postfix(string s) {
 }
 
 int main() {
-  int ncase; scanf("%d", &ncase);
+  int ncase; cin >>ncase;
   for (int icase = 0; icase < ncase; ++icase) {
-    char s[1024]; scanf("%s", s);
-    printf("%s\n", infix_to_postfix(s).c_str());
+    string s; cin >>s;
+    cout <<infix_to_postfix(s) <<endl;
   }
 }
