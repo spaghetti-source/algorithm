@@ -260,12 +260,6 @@ void AOJ_ZIGZAG() {
   int a = digitDP(A, IM, 0);
   int b = digitDP(B, IM, 1);
   cout << (b + (10000 - a)) % 10000 << endl;
-  {
-    auto IM = intersectionAutomaton(zigzag, modulo);
-    int a = digitDP(A, IM, 0);
-    int b = digitDP(B, IM, 1);
-    cout << (b + (10000 - a)) % 10000 << endl;
-  }
 }
 int main() { 
   AOJ_ZIGZAG();
