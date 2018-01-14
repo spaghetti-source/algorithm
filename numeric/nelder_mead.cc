@@ -2,7 +2,7 @@
 // Nelder Mead method (aka. Downhill Simplex Method)
 //
 // Description:
-//   Nelder Mead method is a first-order optimization method
+//   Nelder Mead method is a zeroth-order optimization method
 //   that only requires function evaluation oracle.
 //   Typically, it performs well on a function on a small 
 //   dimensional space.
