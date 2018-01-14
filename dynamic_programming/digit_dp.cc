@@ -107,6 +107,17 @@ string toString(T x) {
   return ss.str();
 }
 
+// 
+// Sum of digits.
+// Since sum is not distributive, (u + v) + d != (u + d + v + d), 
+// we need to augment the number to contain the number of numbers.
+// Let + and * be defined by 
+//   (u,a) + (v,b) = (u+v,a+b),
+//   (u,a) * d = (u+a*d,a).
+// Then, they are right-distributive as
+//   ((u,a) + (v,b)) * c = (u+v,a+b) * c = (u+v+ac+bc,a+b),
+//   (u,a) * c + (v,b) * c = (u+ac,a) + (v+bc,b) = (u+v+ac+bc,a+b).
+//
 using Int = long long;
 Int sumOfDigits(string z, bool eq = true) {
   struct Value {
@@ -160,6 +171,13 @@ Automaton intersectionAutomaton(Automaton1 A, Automaton2 B) {
   return M;
 }
 
+//
+// Count the zigzag numbers that is a multiple of M.
+// Here, a number is zigzag if its digits are alternatively 
+// increasing and decreasing, like 14283415...
+// Since there are multiple conditions, we use automaton 
+// composition to simplify the approach.
+//
 void AOJ_ZIGZAG() {
   char A[1000], B[1000];
   int M;
@@ -219,7 +237,39 @@ void AOJ_ZIGZAG() {
   cout << (b + (10000 - a)) % 10000 << endl;
 }
 
+//
+// Count the numbers that does not contain 4 and 7 in each digit.
+//
+void ABC007D() {
+  string a, b;
+  cin >> a >> b;
+
+  struct ForbiddenNumber {
+    int init = 0;
+    int size() { return 2; }
+    int next(int state, int a) { 
+      if (state == 1) return 1;
+      if (a == 4 || a == 9) return 1;
+      return 0;
+    }
+    bool accept(int state) { return state == 1; }
+  };
+  struct Counter {
+    long long value = 0;
+    Counter &operator+=(Counter x) {
+      value += x.value;
+      return *this;
+    }
+    Counter &operator*=(int d) {
+      return *this;
+    }
+  };
+  cout << digitDP(b, (Counter){1}, ForbiddenNumber(), true).value
+        - digitDP(a, (Counter){1}, ForbiddenNumber(), false).value << endl;
+}
+
 int main() {
+  ABC007D();
   //SPOJ_CPCRC1C();
-  AOJ_ZIGZAG();
+  //AOJ_ZIGZAG();
 }
