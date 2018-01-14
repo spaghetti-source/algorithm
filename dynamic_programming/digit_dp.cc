@@ -38,10 +38,15 @@
 //       for (int state = 0; state < M.size(); ++state)
 //         if (M.accept(state)) oplusTo(ans, dp[n][tight][state];
 //     return ans;
+// 
+//   Here, tight means the left digits are tight so that the current
+//   digit cannot run over 0 to 9, and state means the state of the
+//   automaton, which compresses the 10^len states to |Automaton| states.
 //
 // Verified:
 //   SPOJ_CPCRC1C
 //   AOJ_ZIGZAG
+//   ABC_007D
 
 #include <bits/stdc++.h>
 using namespace std;
