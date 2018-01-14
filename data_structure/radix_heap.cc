@@ -3,15 +3,16 @@
 //
 // Description:
 //
-//   A radix heap is a heap for keys of type unsigned int.
-//   It runs in O(bit) time for each operations with a 
-//   smaller constant factor. It is useful in Dijkstra
-//   shortest path algorithm with integral edge weights.
+//   A radix heap is a monotonic heap for keys of type unsigned int.
+//   Here, a monotonic heap is a heap that allows push(key) only for 
+//   key >= top(). It is useful in the Dijkstra shortest path algorithm
+//   with integral edge weights.
 //   see: https://en.wikipedia.org/wiki/Radix_heap
 //
 // Complexity:
 //
-//   O(|bit|) per operations.
+//   O(|bit|) for all operations. Moreover,
+//   O(1), amortized, for pop.
 //
 // Verified:
 // 
