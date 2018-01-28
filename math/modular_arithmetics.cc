@@ -97,9 +97,9 @@ ModInt stringToModInt(string s, Int mod) {
 // compute inv[1], inv[2], ..., inv[mod-1] in O(n) time
 vector<ModInt> inverse(Int mod) {
   vector<ModInt> inv(mod, ModInt(0, mod));
-  inv[1] = 1;
+  inv[1].val = 1;
   for (Int a = 2; a < mod; ++a) 
-    inv[a] = inv[mod % a] * (mod - mod/a);
+    inv[a] = inv[mod % a] * ModInt(mod - mod/a,mod);
   return inv;
 }
 
@@ -241,32 +241,26 @@ struct ModMatrix {
   static ModMatrix zero(int n, Int mod) {
     return ModMatrix(n, n, mod);
   }
-  // Gauss-Jordan-Blankinship Elimination
-  // It can be used for any composite modulo (Euclidean domain).
+  // mod should be prime
   ModMatrix inv() const { 
     ModMatrix B = eye(n, mod);
-    vector<vector<ModInt>> a = val; 
+    vector<vector<ModInt>>  a = val;
     vector<vector<ModInt>> &b = B.val;
-    for (int j = 0; j < n; ++j) { 
-      // minimum nonzero をとって
-      // Blankinship type の吐き出しを行う
-      for (int i = 0; i < n; ++i) {
-        if (i == j) continue;
-        while (a[i][j].val) { 
-          ModInt t(a[j][j].val/a[i][j].val, mod);
-          for (int k = j; k < n; ++k) swap(a[i][k], a[j][k]-=t*a[i][k]);
-          for (int k = 0; k < n; ++k) swap(b[i][k], b[j][k]-=t*b[i][k]);
-        }
+    for (int i = 0, j, k; i < n; ++i) {
+      for (j = i; j < n && a[j][i].val == 0; ++j);
+      if (j == n) return ModMatrix(0,0,0); // regularity is checked by m = 0
+      swap(a[i], a[j]); 
+      swap(b[i], b[j]);
+      ModInt inv = a[i][i].inv();
+      for (k = i; k < n; ++k) a[i][k] *= inv;
+      for (k = 0; k < n; ++k) b[i][k] *= inv;
+      for (j = 0; j < n; ++j) {
+        if (i == j || a[j][i].val == 0) continue;
+        ModInt c = a[j][i];
+        for (k = i; k < n; ++k) a[j][k] -= c * a[i][k];
+        for (k = 0; k < n; ++k) b[j][k] -= c * b[i][k];
       }
-      if (a[j][j].val == 0) return ModMatrix(0,0,0);
     }
-    for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n; ++j) {
-        cout << a[i][j] << " ";
-      }
-      cout << endl
-    }
-
     return B;
   }
   // It can be used for any composite modulo.
