@@ -43,9 +43,10 @@ ostream &operator<<(ostream &os, const vector<vector<T>> &v) {
 }
 using Int = long long;
 struct ModInt {
-  Int val, mod;
-  ModInt(Int v, Int m) : val(v), mod(m) { }
-  ModInt operator-() const { return ModInt(val?mod-val:val,mod); }
+  static Int mod; // Set this value
+  Int val;
+  ModInt(Int v=0) : val(v%mod) { }
+  ModInt operator-() const { return ModInt(val?mod-val:val); }
   ModInt &operator+=(ModInt a) { 
     if ((val += a.val) >= mod) val -= mod;
     return *this;
@@ -69,37 +70,38 @@ struct ModInt {
     val /= t;
     return (*this) *= a;
   }
-  ModInt inv() const { return ModInt(1,mod) /= (*this); }
+  ModInt inv() const { return ModInt(1) /= (*this); }
   bool operator<(ModInt x) const { return val < x.val; }
 };
-// ModInt modInt(Int v) { return ModInt(v,MOD); } 
+Int ModInt::mod = 1e9+7;
+
 ostream &operator<<(ostream &os, ModInt a) { os << a.val; return os; }
 ModInt operator+(ModInt a, ModInt b) { return a += b; }
 ModInt operator-(ModInt a, ModInt b) { return a -= b; }
 ModInt operator*(ModInt a, ModInt b) { return a *= b; }
 ModInt operator/(ModInt a, ModInt b) { return a /= b; }
 ModInt pow(ModInt a, Int e) { 
-  ModInt x(1, a.mod);
+  ModInt x(1);
   for (; e > 0; e /= 2) {
     if (e % 2 == 1) x *= a;
     a *= a;
   }
   return x;
 }
-ModInt stringToModInt(string s, Int mod) {
+ModInt stringToModInt(string s) {
   Int val = 0;
   for (int i = 0; i < s.size(); ++i) 
-    val = (val*10 + (s[i]-'0')) % mod;
-  return ModInt(val, mod);
+    val = (val*10 + (s[i]-'0')) % ModInt::mod;
+  return ModInt(val);
 }
 
-
 // compute inv[1], inv[2], ..., inv[mod-1] in O(n) time
-vector<ModInt> inverse(Int mod) {
-  vector<ModInt> inv(mod, ModInt(0, mod));
+vector<ModInt> inverse() {
+  Int mod = ModInt::mod;
+  vector<ModInt> inv(mod);
   inv[1].val = 1;
   for (Int a = 2; a < mod; ++a) 
-    inv[a] = inv[mod % a] * ModInt(mod - mod/a,mod);
+    inv[a] = inv[mod % a] * ModInt(mod - mod/a);
   return inv;
 }
 
@@ -113,9 +115,10 @@ bool isQuadraticResidue(ModInt n) {
   return n.val == 0 || n.mod == 2 || pow(n, (n.mod-1)/2).val == 1;
 }
 ModInt sqrt(ModInt n) { 
-  if (n.val == 0 || n.mod == 2) return n;
-  int M = __builtin_ctz(n.mod-1), Q = (n.mod-1)>>M;
-  ModInt z(2, n.mod);
+  const Int mod = ModInt::mod;
+  if (n.val == 0 || mod == 2) return n;
+  int M = __builtin_ctz(mod-1), Q = (mod-1)>>M;
+  ModInt z(2);
   while (isQuadraticResidue(z)) ++z.val;
   ModInt c = pow(z, Q);
   ModInt t = pow(n, Q);
@@ -133,10 +136,10 @@ ModInt sqrt(ModInt n) {
   return R;
 }
 vector<ModInt> quadraticEquation(ModInt a, ModInt b, ModInt c) {
-  if (a.mod == 2) {
+  if (ModInt::mod == 2) {
     vector<ModInt> ans;
     if (c.val == 0) ans.push_back(c);
-    if ((a + b + c).val == 0) ans.push_back(ModInt(1,2));
+    if ((a + b + c).val == 0) ans.push_back(ModInt(1));
     return ans;
   } else {
     b /= (a+a); c /= a; 
@@ -150,13 +153,11 @@ vector<ModInt> quadraticEquation(ModInt a, ModInt b, ModInt c) {
 }
 
 // Discrete Logarithm by Shanks' Baby-Step Giant-Step
-//
 // Find k such that a^k == b 
-//
 Int log(ModInt a, ModInt b) {
-  Int h = ceil(sqrt(a.mod+1e-9));
+  Int h = ceil(sqrt(ModInt::mod+1e-9));
   unordered_map<Int,Int> hash;
-  ModInt x(1, a.mod);
+  ModInt x(1);
   for (Int i = 0; i < h; ++i) {
     if (!hash.count(x.val)) hash[x.val] = i;
     x *= a;
@@ -170,41 +171,14 @@ Int log(ModInt a, ModInt b) {
   return -1;
 }
 
-
-//
-// find solution z.val such that 
-//   z.val == x.val (mod x.mod), for all x.
-// the solution is unique in modulo z.mod.
-//
-Int extgcd(Int a, Int b, Int&x, Int&y) {
-  for (Int u = y = 1, v = x = 0; a; ) {
-    Int q = b / a;
-    swap(x -= q * u, u);
-    swap(y -= q * v, v);
-    swap(b -= q * a, a);
-  }
-  return b; // a x + b y == gcd(a, b)
-}
-ModInt chineseRemainder(vector<ModInt> modular) {
-  ModInt z(0, 1); // z == 0 (mod 1) 
-  for (ModInt x: modular) {
-    Int u, v, g = extgcd(x.mod, z.mod, u, v);
-    z.val = z.val*u*x.mod + x.val*v*z.mod;
-    z.mod = z.mod * (x.mod / g);
-  }
-  if ((z.val %= z.mod) < 0) z.val += z.mod;
-  return z;
-}
-
 struct ModMatrix {
   int m, n; // m times n matrix
   vector<vector<ModInt>> val;
-  Int mod;
   ModInt &operator()(int i, int j) { return val[i][j]; }
-  ModMatrix(int m, int n, Int mod) : 
-    m(m), n(n), mod(mod), val(m, vector<ModInt>(n, ModInt(0,mod))) { }
+  ModMatrix(int m, int n) : 
+    m(m), n(n), val(m, vector<ModInt>(n)) { }
   ModMatrix operator-() const {
-    ModMatrix A(m, n, mod);
+    ModMatrix A(m, n);
     for (int i = 0; i < m; ++i) 
       for (int j = 0; j < n; ++j) 
         A.val[i][j] = -val[i][j];
@@ -224,7 +198,7 @@ struct ModMatrix {
   }
   ModMatrix &operator*=(ModMatrix A) {
     for (int i = 0; i < m; ++i) {
-      vector<ModInt> row(A.n, ModInt(0, A.mod)); 
+      vector<ModInt> row(A.n);
       for (int j = 0; j < A.n; ++j) {
         for (int k = 0; k < A.m; ++k) 
           row[j] += val[i][k] * A.val[k][j];
@@ -233,22 +207,22 @@ struct ModMatrix {
     }
     return *this;
   }
-  static ModMatrix eye(int n, Int mod) {
-    ModMatrix I(n, n, mod);
+  static ModMatrix eye(int n) {
+    ModMatrix I(n, n);
     for (int i = 0; i < n; ++i) I.val[i][i].val = 1;
     return I;
   }
-  static ModMatrix zero(int n, Int mod) {
-    return ModMatrix(n, n, mod);
+  static ModMatrix zero(int n) {
+    return ModMatrix(n, n);
   }
   // mod should be prime
   ModMatrix inv() const { 
-    ModMatrix B = eye(n, mod);
+    ModMatrix B = eye(n);
     vector<vector<ModInt>>  a = val;
     vector<vector<ModInt>> &b = B.val;
     for (int i = 0, j, k; i < n; ++i) {
       for (j = i; j < n && a[j][i].val == 0; ++j);
-      if (j == n) return ModMatrix(0,0,0); // regularity is checked by m = 0
+      if (j == n) return ModMatrix(0,0); // regularity is checked by m = 0
       swap(a[i], a[j]); 
       swap(b[i], b[j]);
       ModInt inv = a[i][i].inv();
@@ -266,12 +240,12 @@ struct ModMatrix {
   // It can be used for any composite modulo.
   ModInt det() const {
     vector<vector<ModInt>> a = val; 
-    ModInt D(1, mod);
+    ModInt D(1);
     for (int j = 0; j < n; ++j) {
       for (int i = j+1; i < n; ++i) {
         while (a[i][j].val) { 
           D = -D;
-          ModInt t(a[j][j].val/a[i][j].val, mod);
+          ModInt t(a[j][j].val/a[i][j].val);
           for (int k = j; k < n; ++k) 
             swap(a[i][k], a[j][k] -= t * a[i][k]);
         }
@@ -285,7 +259,7 @@ ModMatrix operator+(ModMatrix A, ModMatrix B) { return A += B; }
 ModMatrix operator-(ModMatrix A, ModMatrix B) { return A -= B; }
 ModMatrix operator*(ModMatrix A, ModMatrix B) { return A *= B; }
 ModMatrix pow(ModMatrix A, int k) {
-  ModMatrix X = ModMatrix::eye(A.n, A.mod);
+  ModMatrix X = ModMatrix::eye(A.n);
   for (; k > 0; k /= 2) {
     if (k % 2 == 1) X *= A;
     A *= A;
@@ -293,7 +267,7 @@ ModMatrix pow(ModMatrix A, int k) {
   return X;
 }
 ModInt dot(ModMatrix A, ModMatrix B) {
-  ModInt val(0, A.mod);
+  ModInt val;
   for (int i = 0; i < A.m; ++i)
     for (int j = 0; j < A.n; ++j)
       val += A.val[i][j] * B.val[i][j];
@@ -301,13 +275,18 @@ ModInt dot(ModMatrix A, ModMatrix B) {
 }
 using ModVector = vector<ModInt>;
 ModVector operator*(ModMatrix A, ModVector x) {
-  vector<ModInt> y(A.m, ModInt(0, A.mod)); 
+  vector<ModInt> y(A.m);
   for (int i = 0; i < A.m; ++i) 
     for (int j = 0; j < A.n; ++j)
       y[i] += A.val[i][j] * x[j];
   return y;
 }
-
+ModInt dot(ModVector a, ModVector b) {
+  ModInt val;
+  for (int i = 0; i < a.size(); ++i)
+    val += a[i] * b[i];
+  return val;
+}
 
 //
 // Only available for prime modulos.
@@ -318,8 +297,7 @@ struct LUDecomposition {
   int n;
   vector<int> pi;
   vector<vector<ModInt>> val;
-  Int mod;
-  LUDecomposition(ModMatrix A) : n(A.n), val(A.val), mod(A.mod) {
+  LUDecomposition(ModMatrix A) : n(A.n), val(A.val) {
     pi.resize(n+1);
     iota(all(pi), 0);
     for (int i = 0, j, k; i < n; ++i) {
@@ -341,7 +319,7 @@ struct LUDecomposition {
   }
   bool isRegular() const { return pi[n] >= 0; }
   ModVector solve(ModVector b) {
-    vector<ModInt> x(b.size(), ModInt(0, mod)); 
+    vector<ModInt> x(b.size());
     for (int i = 0; i < n; ++i) {
       x[i] = b[pi[i]];
       for (int k = 0; k < i; ++k) 
@@ -355,7 +333,7 @@ struct LUDecomposition {
     return x;
   }
   ModMatrix inverse() { // do not compute the inverse
-    ModMatrix B(n, n, mod);
+    ModMatrix B(n, n);
     for (int j = 0; j < n; ++j) {
       for (int i = 0; i < n; ++i) {
         if (pi[i] == j) B.val[i][j].val = 1;
@@ -379,17 +357,17 @@ struct LUDecomposition {
 };
 
 void mulTest() {
-  Int mod = 1e9+7;
+  ModInt::mod = 1e9+7;
   int m = 4, n = 4;
-  ModMatrix A(m,n,mod);
-  ModMatrix B(m,n,mod);
-  vector<ModInt> b(n, ModInt(0, mod));
+  ModMatrix A(m,n);
+  ModMatrix B(m,n);
+  vector<ModInt> b(n);
   for (int i = 0; i < m; ++i) {
     for (int j = 0; j < n; ++j) {
-      A(i,j).val = rand() % mod;
-      B(i,j).val = rand() % mod;
+      A(i,j).val = rand() % ModInt::mod;
+      B(i,j).val = rand() % ModInt::mod;
     }
-    b[i].val = rand() % mod;
+    b[i].val = rand() % ModInt::mod;
   }
   ModMatrix C = A * B;
 
@@ -415,8 +393,9 @@ void CF_QUADRATIC_EQUATIONS() {
   for (int icase = 0; icase < ncase; ++icase) {
     Int a, b, c, p;
     cin >> a >> b >> c >> p;
+    ModInt::mod = p;
     vector<ModInt> ans = quadraticEquation(
-      ModInt(a,p), ModInt(b,p), ModInt(c,p));
+      ModInt(a), ModInt(b), ModInt(c));
     cout << ans.size();
     for (int i = 0; i < ans.size(); ++i) 
       cout << " " << ans[i].val;
@@ -425,7 +404,8 @@ void CF_QUADRATIC_EQUATIONS() {
 }
 
 void CF_DISCLOG() {
-  ModInt a(21309,999998999999), b(696969,999998999999);
+  ModInt::mod = 999998999999;
+  ModInt a(21309), b(696969);
   cout << log(a, b) << endl;
 }
 
@@ -434,7 +414,8 @@ int SPOJ_MIFF() {
     int n, p; scanf("%d %d", &n, &p);
     if (n == 0 && p == 0) break;
     if (icase > 0) printf("\n");
-    ModMatrix A(n, n, p);
+    ModInt::mod = p;
+    ModMatrix A(n, n);
     for (int i = 0; i < n; ++i)
       for (int j = 0; j < n; ++j)
         scanf("%d", &A(i,j));
