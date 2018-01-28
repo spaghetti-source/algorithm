@@ -121,15 +121,15 @@ ModInt sqrt(ModInt n) {
   ModInt t = pow(n, Q);
   ModInt R = pow(n, (Q+1)/2);
   while (t.val != 1) {
-		int i = 0;
+    int i = 0;
     for (ModInt s = t; s.val != 1; s *= s) ++i;
     if (M == i) exit(0);
     ModInt b = pow(c, 1<<(M-i-1));
-		M = i;
+    M = i;
     c = b*b;
     t *= c;
-		R *= b;
-	}
+    R *= b;
+  }
   return R;
 }
 vector<ModInt> quadraticEquation(ModInt a, ModInt b, ModInt c) {
