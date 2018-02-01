@@ -1,4 +1,6 @@
 //
+// !!It may incur the index-out-of-range error!!
+//
 // General Graph Matching (Gabow-Edmonds)
 //
 // Description:
