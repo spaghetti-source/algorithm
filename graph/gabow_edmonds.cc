@@ -1,127 +1,197 @@
 //
-// !!It may incur the index-out-of-range error!!
-//
 // General Graph Matching (Gabow-Edmonds)
 //
 // Description:
-//   It computes a maximum matching in a general graph.
+//   
+//   For a graph G = (V, E), a matching M is a set of edges
+//   such that any vertex is contained in M at most once.
+//   The matching with maximum cardinality is computed by
+//   the Edmonds blossom algorithm.
 //
-// Algorithm:
-//   Gabow's simplified version of Edmonds' blossom algorithm.
-// 
-// Comlexity:
-//   O(n^3)
+//   This implementation is the Gabow's simplified version
+//   with the lazy update technique to improve the complexity
+//   in sparse graphs.
+//
+//
+// Complexity:
+//
+//   O(n m log n)
+//
 //
 // Verified:
-//   LA3820, LA4130
+//
+//   SPOJ ADABLOOM
+//
 //
 // References:
 //   H.Gabow (1976):
 //   An efficient implementation of Edmonds' algorithm for maximum matching on graphs.
 //   Journal of the ACM, vol.23, no.2, pp.221-234.
 //
+//   http://min-25.hatenablog.com/entry/2016/11/21/222625
+//
+//
 
-#include <cstring>
-#include <vector>
-#include <queue>
-#include <iostream>
-#include <cstdlib>
-#include <cstdio>
-#include <algorithm>
-#include <set>
-
+// g++ -std=c++17 -O3 -fmax-errors=1 -fsanitize=undefined
+#include <bits/stdc++.h>
 using namespace std;
 
-struct graph {
+#define fst first
+#define snd second
+#define all(c) ((c).begin()), ((c).end())
+
+struct Graph {
   int n;
-  vector<vector<int>> adj;
-  graph(int n) : n(n), adj(n) { };
-  void add_edge(int x, int y) {
-    adj[x].push_back(y);
-    adj[y].push_back(x);
+  vector< vector<int> > adj;
+  Graph(int n) : n(n), adj(n) { };
+  void addEdge(int u, int v) {
+    adj[u].push_back(v);
+    adj[v].push_back(u);
   }
-  queue<int> Q;
-  vector<int> label, mate, cycle;
-  void rematch(int x, int y) {
-    int m = mate[x]; mate[x] = y;
-    if (mate[m] == x) {
-      if (label[x] < n) {
-        rematch(mate[m] = label[x], m);
+
+  vector<int> mate;
+  int maximumMatching() {
+    mate.assign(n+1, n);
+    vector<int> first(n+1, n), que(n);
+    vector<pair<int,int>> label(n+1, make_pair(-1,-1));
+    int head = 0, tail = 0;
+
+    function<void(int,int)> rematch = [&](int v, int w) {
+      int t = mate[v]; mate[v] = w;
+      if (mate[t] != v) return;
+      if (label[v].snd == -1) {
+        mate[t] = label[v].fst;
+        rematch(mate[t], t);
       } else {
-        int s = (label[x]-n)/n, t = (label[x]-n)%n;
-        rematch(s, t); rematch(t, s);
+        int x, y; tie(x, y) = label[v];
+        rematch(x, y); rematch(y, x);
       }
-    }
-  }
-  void traverse(int x) {
-    vector<int> save = mate;
-    rematch(x, x);
-    for (int u = 0; u < n; ++u) 
-      if (mate[u] != save[u]) cycle[u] ^= 1;
-    save.swap(mate);
-  }
-  void relabel(int x, int y) {
-    cycle = vector<int>(n, 0); 
-    traverse(x);
-    traverse(y);
-    for (int u = 0; u < n; ++u) {
-      if (!cycle[u] || label[u] >= 0) continue;
-      label[u] = n+x+y*n;
-      Q.push(u);
-    }
-  }
-  int augment(int r) {
-    label.assign(n, -2);
-    label[r] = -1;
-    Q = queue<int>(); Q.push(r);
-    while (!Q.empty()) {
-      int x = Q.front(); Q.pop();
-      for (int y: adj[x]) {
-        if (mate[y] < 0 && r != y) {
-          rematch(mate[y] = x, y); return 1;
-        } else if (label[y] >= -1) {
-          relabel(x, y);
-        } else if (label[mate[y]] < -1) {
-          label[mate[y]] = x;
-          Q.push(mate[y]);
+    };
+    auto relabel = [&](int x, int y) {
+      function<int(int)> findFirst = [&](int u) {
+        return label[first[u]].fst < 0 ? first[u] :
+               first[u] = findFirst(first[u]);
+      };
+      int r = findFirst(x), s = findFirst(y);
+      if (r == s) return; 
+      auto h = make_pair(~x, y);
+      label[r] = label[s] = h;
+      int join;
+      while (1) {
+        if (s != n) swap(r, s);
+        r = findFirst(label[mate[r]].fst);
+        if (label[r] == h) {
+          join = r;
+          break;
+        } else {
+          label[r] = h;
         }
       }
-    }
-    return 0;
-  }
-  int maximum_matching() {
-    mate.assign(n, -2);
+      for (int v: {first[x], first[y]}) {
+        for (; v != join; v = first[label[mate[v]].fst]) {
+          label[v] = make_pair(x, y);
+          first[v] = join;
+          que[tail++] = v;
+        }
+      }
+    };
+    auto augment = [&](int u) {
+      label[u] = make_pair(n, -1);
+      first[u] = n;
+      head = tail = 0;
+      for (que[tail++] = u; head < tail;) {
+        int x = que[head++];
+        for (int y: adj[x]) {
+          if (mate[y] == n && y != u) {
+            mate[y] = x;
+            rematch(x, y);
+            return true; 
+          } else if (label[y].fst >= 0) {
+            relabel(x, y);
+          } else if (label[mate[y]].fst == -1) {
+            label[mate[y]].fst = x;
+            first[mate[y]] = y;
+            que[tail++] = mate[y];
+          } 
+        }
+      }
+      return false;
+    };
     int matching = 0;
-    for (int u = 0; u < n; ++u) 
-      if (mate[u] < 0) matching += augment(u);
+    for (int u = 0; u < n; ++u) {
+      if (mate[u] < n || !augment(u)) continue;
+      ++matching;
+      for (int i = 0; i < tail; ++i) 
+        label[que[i]] = label[mate[que[i]]] = make_pair(-1,-1);
+      label[n] = make_pair(-1, -1);
+    }
     return matching;
   }
 };
 
-int doit() {
-  int n, m; 
-  scanf("%d %d", &n, &m);
 
-  vector<int> v(n);
-  for (int i = 0; i < n; ++i) {
-    scanf("%d", &v[i]);
-  }
-  set<int> S;
-  for (int i = 0; i < m; ++i) {
-    int x;
-    scanf("%d", &x);
-    S.insert(x);
-  }
-
-  graph g(n);
-  for (int i = 0; i < n; ++i) {
-    for (int j = i+1; j < n; ++j) {
-      if (S.count(v[i] + v[j])) 
-        g.add_edge(i, j);
+void LA3820() {
+  int ncase; scanf("%d", &ncase);
+  for (int icase = 0; icase < ncase; ++icase) {
+    int n, m; 
+    scanf("%d %d", &n, &m);
+    vector<int> v(n);
+    for (int i = 0; i < n; ++i) {
+      scanf("%d", &v[i]);
     }
+    set<int> S;
+    for (int i = 0; i < m; ++i) {
+      int x;
+      scanf("%d", &x);
+      S.insert(x);
+    }
+    Graph G(n);
+    for (int i = 0; i < n; ++i) {
+      for (int j = i+1; j < n; ++j) {
+        if (S.count(v[i] + v[j])) 
+          G.addEdge(i, j);
+      }
+    }
+    printf("%d\n", G.maximumMatching());
   }
-  return g.maximum_matching();
 }
+
+void UOJ79() {
+  int n, m; cin >> n >> m;
+  Graph g(n);
+  for (int i = 0; i < m; ++i) {
+    int u, v;
+    cin >> u >> v;
+    g.addEdge(u-1, v-1);
+  }
+  cout << g.maximumMatching() << endl;
+  for (int u = 0; u < n; ++u) {
+    if (u > 0) cout << " ";
+    if (g.mate[u] >= n) cout << 0;
+    else                cout << g.mate[u]+1;
+  }
+  cout << endl;
+}
+void SPOJ_ADABLOOM() {
+  int ncase; scanf("%d", &ncase);
+  for (int icase; icase < ncase; ++icase) {
+    int n; scanf("%d", &n);
+    vector<long long> a(n);
+    for (int i = 0; i < n; ++i) 
+      scanf("%lld", &a[i]);
+    random_shuffle(all(a));
+    Graph g(n);
+    for (int i = 0; i < n; ++i) { 
+      for (int j = 0; j < n; ++j) {
+        if (a[i] < (a[i] ^ a[j]) && (a[i] ^ a[j]) < a[j]) g.addEdge(i, j);
+      }
+    }
+    cout << g.maximumMatching() << endl;
+  }
+}
+
 int main() {
-  doit();
+  SPOJ_ADABLOOM();
+  //UOJ79();
+  //LA3820();
 }
