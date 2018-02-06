@@ -6,18 +6,17 @@
 //   Let a, b, n, m be nonnegative integers. The task is to compute 
 //     sum_{i in [0,n)} floor((a + ib)/m).
 //
-//   We compute this quantity in x-axis and y-axis alternately. 
+//   We compute this quantity in two directions alternately.
 //   First, let 
 //     a = (a/m) m + (a%m), 
 //     b = (b/m) m + (b%m).
 //   Then the quantity is
 //     sum [(a/m)+i*(b/m)] + floor(((a%m) + i(b%m))/m)
 //   Here, the first term is analytically evaluated.
-//   If b%m == 0 then the second term is zero. 
-//   Otherwise, the task is reduced to compute
+//   The second term is zero if b%m == 0. Otherwise, the task is 
+//   reduced to compute
 //     sum_{i in [0,n)} floor((a + ib)/m)
-//   where a < m, b < m. By changing the axes, we can observe
-//   that this quantity is equal to
+//   where a < m, b < m. By changing the axes, this quantity is 
 //     sum_{i in [0,n')} floor((a' + ib')/m')
 //   where
 //     n' = (a + b n) / m,
@@ -25,13 +24,17 @@
 //     b' = m,
 //     m' = b.
 //
-//   We can observe that the computation on b and m is the same
-//   as the computation of gcd(b,m). Thus the number of iterations
-//   is at most O(log m).
+//   We evaluate the number of iterations. Since the computation 
+//   between b and m is the same as the one of the Euclidean 
+//   algorithm. Thus it terminates in O(log m) time.
 //
 // Complexity:
 //
 //   O(log m).
+//
+// Verified:
+// 
+//   Somewhere
 
 #include <iostream>
 #include <vector>
@@ -43,7 +46,7 @@ using namespace std;
 
 #define fst first
 #define snd second
-#define aInt(c) ((c).begin()), ((c).end())
+#define all(c) ((c).begin()), ((c).end())
 
 //
 // sum_{0<=i<n} floor(a + b i)/m; assume n, m >= 0, a >= 0, b >= 0
