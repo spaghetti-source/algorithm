@@ -27,24 +27,28 @@ struct UndoableUnionFind {
   UndoableUnionFind(int n) : parent(n, -1) { };
   bool unite(int u, int v) { 
     u = root(u); v = root(v);
-    if (u == v) return false;
-    if (parent[u] > parent[v]) swap(u, v);
-    history.push_back(make_tuple(u, v, parent[v]));
-    parent[u] += parent[v]; parent[v] = u;
-    return true;
+    if (u == v) {
+      history.push_back(make_tuple(-1,-1,-1));
+      return false;
+    } else {
+      if (parent[u] > parent[v]) swap(u, v);
+      history.push_back(make_tuple(u, v, parent[v]));
+      parent[u] += parent[v]; parent[v] = u;
+      return true;
+    }
   }
   void undo() {
     int u, v, w; 
     tie(u, v, w) = history.back();
     history.pop_back();
+    if (u == -1) return;
     parent[v] = w;
     parent[u] -= parent[v];
   }
   bool find(int u, int v) { return root(u) == root(v); }
-  int root(int u) { return parent[u] < 0 ? u : parent[u] = root(parent[u]); }
+  int root(int u) { while (parent[u] >= 0) u = parent[u]; return u; }
   int size(int u) { return -parent[root(u)]; }
 };
-
 
 struct OfflineDynamicConnectivity {
   int n;
