@@ -1,0 +1,174 @@
+# -*- coding: utf-8 -*-
+"""
+@author: sasta_achar
+"""
+
+#import pandas to import datasets
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+
+#We can use this instead of the dot function 
+def mx(x,slopes):
+    mx_sum =0
+    for i in range(len(slopes)):
+        mx_sum += x[i]*slopes[i]
+    return mx_sum
+
+#dot product 
+def dot(vector_a,vector_b):
+    #print(vector_a,vector_b)
+    dot_product = 0
+    if len(vector_a) != len(vector_b):
+        return -1;
+    for i in range(len(vector_a)):
+        dot_product += vector_a[i]*vector_b[i]
+    return dot_product
+
+def R_sq_value(slopes, intercept, x_train, y_train):
+    
+    #may need to change to int64 , cause float32 sometimes gives wrong answers due to overflow \(^o^)/
+    #x_train = x_train.astype("int64")
+    sum_of_errors = 0
+    
+    for i in range(len(x_train)):
+        sum_of_errors += (y_train[i]  - ((np.dot(x_train[i,:],slopes)) + intercept))**2
+        
+    #avg  error
+    sum_of_errors = sum_of_errors / len(x_train) 
+    
+    return sum_of_errors
+
+def gradient_decent(x_train, y_train, slopes, intercept, LearningRate = 0.3):
+   
+    x_gradients = np.zeros(x_train.shape[1])
+    c_gradient = 0
+    
+    for i in range(len(y_train)):     
+        #yp is the predicted value
+        yp = (dot(x_train[i,:],slopes)) + intercept
+        #yp = (slopes.dot(x_train[i])) + intercept
+        
+       
+        for j in range(x_train.shape[1]):
+            x_gradients[j] += -2*((x_train[i,j])*(y_train[i] - yp))
+        c_gradient  += 2*(-(y_train[i] - yp))
+    
+    x_gradients = x_gradients * (1/len(y_train))
+    c_gradient = c_gradient * (1/len(y_train))
+   
+    updated_x_gradient = slopes - (LearningRate*x_gradients)
+    updated_c_gradient = intercept - (LearningRate*c_gradient)
+    
+   
+    return [updated_x_gradient,updated_c_gradient]
+
+    
+def LinearRegression(x_train,   y_train,    LearningRate = 0.1, iteration = 1000):
+   
+    # y = m1*x1 + m2*x2 + m3*x3 +....+ mn*xn + c  (n is the size of x_train i.e no of features), c is the intercept
+    n = x_train.shape[1]
+    intercept  = 0
+    
+    #These m1,m2....mn is stored in slopes , we will initialiae it with 0, then keep updating it
+    slopes = np.zeros(n)
+    #slopes = slopes.astype("int64")
+    
+    #Gradient Decent 
+    
+    #first we will define the loss(to measure how wrong we are i.e the error value)
+    loss = []
+    
+    #we update the slopes using their Gradient values 
+    #Gradient is a vector with the partial differential of the function (in our case the error value) with respect to differnt variables
+    for i in range(iteration):
+        
+        slopes, intercept = gradient_decent(x_train, y_train, slopes, intercept)
+        loss.append( [ i, R_sq_value(slopes, intercept, x_train, y_train) ])
+        print( R_sq_value(slopes, intercept, x_train, y_train))
+        
+    return [slopes,intercept,loss]
+
+def predict(x_test,slope,intercept):
+    y_predict = np.zeros(len(x_test))
+    for i in range(len(x_test)):
+        y_predict[i] = np.dot((x_test[i,]),slope) + intercept
+    return y_predict
+    
+def scale(x):
+    
+        
+    for j in range(x.shape[1]):
+        mean_x = 0
+        for i in range(len(x)):
+            mean_x += x[i,j]
+        mean_x = mean_x / len(x)
+        sum_of_sq = 0
+        for i in range(len(x)):
+            sum_of_sq += (x[i,j] - mean_x)**2
+        stdev = sum_of_sq / (x.shape[0] -1)
+        for i in range(len(x)):
+            x[i,j] = (x[i,j] - mean_x) / stdev
+    return x        
+        
+def plot(loss):
+      for i in loss:
+          #here i took 300 cause we can visualize the min value of error at 300
+          if(i[0] == 300):
+              break;
+          plt.plot(i[0],i[1],'r.')
+        
+      plt.show()
+        
+if __name__ == "__main__":
+    
+    #import the dataset
+    from sklearn.datasets import load_boston
+    boston_dataset = load_boston()
+    boston = pd.DataFrame(boston_dataset.data, columns=boston_dataset.feature_names)
+    boston['MEDV'] = boston_dataset.target
+    data = boston
+    data_x = pd.DataFrame(np.c_[boston['LSTAT'], boston['RM']], columns = ['LSTAT','RM'])
+    data_y = boston['MEDV']
+    x = data_x.iloc[:,:].values
+    y = data_y.iloc[:].values
+    
+    #split the data
+    x_train,x_test,y_train,y_test = train_test_split(x,y,test_size = 0.2,random_state=0)
+    
+    #Standard Scaling
+    x_train = scale(x_train)
+    x_test = scale(x_test)
+    
+    #Performing the Regression
+    slope,intercept,loss  = LinearRegression(x_train,y_train) 
+  
+    plot(loss)
+    #To predict
+    y_predict = predict(x_test,slope,intercept)
+
+    print("\nResults using the Sk Learn Model")
+    from sklearn.linear_model import LinearRegression
+    regression_model = LinearRegression()
+    # Fit the data(train the model)
+    regression_model.fit(x_train, y_train)
+    # Predict
+    y_predicted = regression_model.predict(x_test)
+    
+    from sklearn.metrics import mean_squared_error, r2_score
+    # model evaluation
+    rmse = mean_squared_error(y_test, y_predicted)
+    r2 = r2_score(y_test, y_predicted)
+    slopes2 = regression_model.coef_
+    # printing values
+    print('Slope:' ,regression_model.coef_)
+    print('Intercept:', regression_model.intercept_)
+    print('Root mean squared error: ', rmse)
+    print('R2 score: ', r2)
+    
+    print("\nResults using our Learn Model")
+    print('Slope:' ,slope)
+    print('Intercept:', intercept)
+
