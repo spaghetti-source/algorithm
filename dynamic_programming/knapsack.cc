@@ -1,77 +1,53 @@
-//
-// 0/1 Knapsack Problem (Dynamic Programming)
-//
-// Description:
-//   We are given a set of items with profit p_i and weight w_i.
-//   The problem is to find a subset of items that maximizes
-//   the total profit under the total weight less than some capacity c.
-//
-//   1) c is small     ==> weight DP
-//   2) p is small     ==> price DP
-//   3) both are large ==> branch and bound.
-//
-// Algorithm:
-//   weight DP:
-//   Let F[a,i] be the max profit for weight <= a using items 1 ... i.
-//   Then we have
-//     F[a, i] = max(F[a, i-1], F[a-w[i], i-1] + p[i]).
-//   The solution is F[c,n].
-//
-//   Profit DP:
-//   Let F[a,i] be the min weight for profit >= a using items 1 ... i.
-//   Then we have
-//     F[a, i] = min(F[a, i-1], F[a-p[i], i-1] + w[i]).
-//   The solution is max { a : F[a,n] <= c }
-//
-// Complexity:
-//   O(n c) for weight DP.
-//   O(n (sum p)) for profit DP.
-//
-// Verified:
-//   SPOJ3321.
-
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-
+#include<iostream>
 using namespace std;
 
-// weight DP
-// Complexity: O(nc)
-//
-// F[a] := maximum profit for weight >= a
-//
-int knapsackW(vector<int> p, vector<int> w, int c) {
-  int n = w.size();
-  vector<int> F(c+1);
-  for (int i = 0; i < n; ++i)
-    for (int a = c; a >= w[i]; --a)
-      F[a] = max(F[a], F[a-w[i]] + p[i]);
-  return F[c];
-}
+int main()
+{
+    int n,W,i,j,count=0;
+    cout<<"Enter the weight capacity of the bag : ";
+    cin>>W;
+    cout<<"Enter the number of items :";
+    cin>>n;
+    int v[n],w[n],T[n+1][W+1];
+    cout<<"Enter weight and value of each item respectively :\n";
+    for(i=0;i<n;i++)
+    {
+        cout<<i+1<<" ";
+        cin>>w[i]>>v[i];
+    }
 
-// Profit DP
-// Complexity: O(n sum p)
-//
-// F[a] := minimum weight for profit a
-//
-int knapsackP(vector<int> p, vector<int> w, int c) {
-  int n = p.size(), P = accumulate(all(p), 0);
-  vector<int> F(P+1, c+1); F[0] = 0;
-  for (int i = 0; i < n; ++i)
-    for (int a = P; a >= p[i]; --a)
-      F[a] = min(F[a], F[a-p[i]] + w[i]);
-  for (int a = P; a >= 0; --a)
-    if (F[a] <= c) return a;
-}
+    for(j=0;j<=W;j++)
+        T[0][j]=0;
+    for(i=0;i<=n;i++)
+        T[i][0]=0;
+    for(i=1;i<=n;i++)
+    {
+        for(j=1;j<=W;j++)
+        {
+            if(w[i-1]<=j)
+                if(T[i-1][j]<v[i-1]+T[i-1][j-w[i-1]])
+                    T[i][j]=v[i-1]+T[i-1][j-w[i-1]];
+                else
+                    T[i][j]=T[i-1][j];
+            else
+                T[i][j]=T[i-1][j];
+        }
+    }
 
+    bool req[n+1];
 
-int main() {
-  vector<int> p = {3,1,4,1,5,9};
-  vector<int> w = {2,6,5,3,5,8};
-  int c = 10;
+    for(i=0;i<n+1;i++)
+        req[i]=0;
 
-  cout << knapsackW(p, w, c) << endl;
-  cout << knapsackP(p, w, c) << endl;
+    for(j=W-1;j>0;j--)
+        for(i=n-1;i>0;i--)
+            if(T[i+1][j]!=T[i][j])
+                req[i]=1;
+    cout<<"The maximum value is : "<<T[n][W]<<"\nThe items to be put into knapsack : ";
+    for(i=1;i<=n;i++)
+        if(req[i])
+            cout<<i<<"\t";
+
+    return 0;
+
 }
