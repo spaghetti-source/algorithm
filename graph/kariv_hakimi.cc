@@ -123,7 +123,7 @@ struct Graph {
         }
       }
       yi = min(d[s][v[k]]+w, d[t][v[k]]); 
-      if (yi < y) { y = yi; x = 1; } 
+      if (yi < y) { y = yi; x = w; } 
       if (y < D) { D = y; h = x; e = *it; }
     }
     printf("%d\n", D); 
