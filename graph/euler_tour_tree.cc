@@ -97,8 +97,10 @@ struct euler_tour_tree {
     return uv;
   }
   void cut(node *uv) {
-    splay(uv); disconnect(uv,1); splay(uv->r); 
-    join(disconnect(uv,0), disconnect(uv->r,1));
+    splay(uv->r); splay(uv);
+    int d = 0; for (auto ptr = uv->r; ptr != uv; ptr = ptr->p) d = dir(ptr);
+    disconnect(uv,d); splay(uv->r);
+    join(disconnect(uv,!d), disconnect(uv->r,d));
     delete uv, uv->r;
   }
   int sum_in_component(node *u) {
