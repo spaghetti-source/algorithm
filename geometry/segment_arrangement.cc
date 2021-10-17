@@ -245,7 +245,7 @@ struct Arrangement : DoublyConnectedEdgeList {
 
       sort(all(inserter), [&](Node *x, Node *y) {
         const Segment &s = segs[x->index], &t = segs[y->index];
-        return sign(cross(s.q - s.p, t.q - t.p)) >= 0;
+        return sign(cross(s.q - s.p, t.q - t.p)) > 0;
       });
       auto addEvent = [&](Node *x, Node *y) {
         if (!x || !y) return;
